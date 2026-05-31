@@ -3,184 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concept Clarifier | Study Buddy</title>
+    <title>Concept Clarifier Pro | Study Buddy</title>
     <style>
-        /* CSS Styling */
+        /* Modern CSS Styling */
         :root {
-            --primary-color: #6366f1; /* Indigo */
-            --primary-hover: #4f46e5;
-            --bg-color: #f3f4f6;
-            --surface-color: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --border-color: #e5e7eb;
+            --primary: #4338ca;
+            --primary-light: #6366f1;
+            --bg-color: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-light: #475569;
+            --border: #e2e8f0;
+            --accent-bg: #e0e7ff;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
+            color: var(--text-dark);
+            line-height: 1.7;
+            padding: 40px 20px;
             display: flex;
             justify-content: center;
-            padding: 40px 20px;
         }
 
         .container {
-            background-color: var(--surface-color);
-            max-width: 800px;
+            background-color: var(--surface);
+            max-width: 850px;
             width: 100%;
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 10px;
-            color: var(--text-main);
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 8px;
         }
 
         p.subtitle {
             text-align: center;
-            color: var(--text-muted);
+            color: var(--text-light);
             margin-bottom: 30px;
+            font-size: 1.1rem;
         }
 
         textarea {
             width: 100%;
-            height: 180px;
-            padding: 16px;
+            height: 160px;
+            padding: 20px;
             font-size: 16px;
-            font-family: inherit;
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--border);
             border-radius: 12px;
             resize: vertical;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
             margin-bottom: 20px;
+            background-color: #fdfdfd;
         }
 
         textarea:focus {
             outline: none;
-            border-color: var(--primary-color);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px var(--accent-bg);
         }
 
         button {
             width: 100%;
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
             border: none;
             padding: 16px;
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             border-radius: 12px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.1s ease;
         }
 
         button:hover {
-            background-color: var(--primary-hover);
+            background-color: var(--primary-light);
+        }
+
+        button:active {
+            transform: scale(0.98);
         }
 
         button:disabled {
-            background-color: var(--text-muted);
+            background-color: var(--text-light);
             cursor: not-allowed;
         }
 
-        /* Output Section */
+        /* Output & Loader */
         #loader {
             display: none;
             text-align: center;
-            margin-top: 30px;
-            color: var(--primary-color);
-            font-weight: 500;
-            animation: pulse 1.5s infinite;
+            margin-top: 40px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.2rem;
+            animation: pulse 1.5s infinite ease-in-out;
         }
 
         @keyframes pulse {
-            0% { opacity: 0.5; }
+            0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
-            100% { opacity: 0.5; }
         }
 
         #output-container {
             display: none;
             margin-top: 40px;
-            animation: fadeIn 0.5s ease;
+            animation: slideUp 0.6s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .concept-card {
-            background-color: #f8fafc;
-            border-left: 5px solid var(--primary-color);
-            padding: 20px;
-            border-radius: 0 12px 12px 0;
-            margin-bottom: 20px;
+        .section-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 6px solid var(--primary-light);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         }
 
-        .concept-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            font-size: 18px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .section-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .concept-card ul {
+        .section-card p {
+            color: var(--text-dark);
+            text-align: justify;
+        }
+
+        /* CSS Block Arrows & Flowchart Logic */
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            background-color: var(--accent-bg);
+            color: var(--primary);
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #c7d2fe;
+        }
+
+        /* The Block Arrow */
+        .block-arrow {
+            width: 0; 
+            height: 0; 
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid var(--primary-light);
+            margin: 10px 0;
+        }
+
+        .takeaways-list {
             padding-left: 20px;
         }
 
-        .concept-card li {
-            margin-bottom: 8px;
+        .takeaways-list li {
+            margin-bottom: 10px;
+            color: var(--text-dark);
         }
 
         @media (max-width: 600px) {
-            .container { padding: 20px; }
+            .container { padding: 25px 15px; }
+            h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Concept Clarifier</h1>
-        <p class="subtitle">Paste any complicated textbook concept below, and I'll make it make sense.</p>
+        <h1>Concept Clarifier Pro</h1>
+        <p class="subtitle">Detailed breakdowns, visual mapping, and no cut corners.</p>
 
-        <textarea id="conceptInput" placeholder="Paste your complex concept, theory, or reading assignment here..."></textarea>
+        <textarea id="conceptInput" placeholder="Paste your massive, complicated textbook concept or lecture notes here..."></textarea>
         
-        <button id="simplifyBtn" onclick="processConcept()">Simplify & Explain</button>
+        <button id="simplifyBtn" onclick="processConcept()">Analyze & Explain</button>
 
-        <div id="loader">Analyzing and translating into student-friendly terms...</div>
+        <div id="loader">Mapping logic and generating visual breakdown...</div>
 
         <div id="output-container">
-            <div class="concept-card">
-                <h3>1. The Gist (In Plain English)</h3>
-                <p id="out-gist"></p>
+            
+            <div class="section-card">
+                <h3>📚 The Complete Breakdown</h3>
+                <p id="out-deepdive"></p>
             </div>
 
-            <div class="concept-card">
-                <h3>2. The "Convincing" Analogy</h3>
+            <div class="section-card">
+                <h3>🔄 Step-by-Step Logic</h3>
+                <p style="color: var(--text-light); margin-bottom: 15px; font-size: 0.95rem;">
+                    Here is how the concept flows structurally:
+                </p>
+                <div class="flow-container" id="out-flow">
+                    </div>
+            </div>
+
+            <div class="section-card">
+                <h3>💡 The "Make it Click" Analogy</h3>
                 <p id="out-analogy"></p>
             </div>
 
-            <div class="concept-card">
-                <h3>3. Key Takeaways</h3>
-                <ul id="out-takeaways"></ul>
+            <div class="section-card">
+                <h3>🎯 Bottom Line Takeaways</h3>
+                <ul class="takeaways-list" id="out-takeaways"></ul>
             </div>
+
         </div>
     </div>
 
     <script>
-        // JavaScript Logic
         function processConcept() {
             const inputTxt = document.getElementById('conceptInput').value.trim();
             const btn = document.getElementById('simplifyBtn');
@@ -192,53 +250,79 @@
                 return;
             }
 
-            // Hide previous output & show loader
+            // UI Reset for Loading State
             outputContainer.style.display = 'none';
             loader.style.display = 'block';
             btn.disabled = true;
             btn.innerText = "Processing...";
 
             // ==========================================
-            // API INTEGRATION POINT
+            // API INTEGRATION SIMULATION
             // ==========================================
-            // In a real application, you would make an async fetch call here 
-            // to an AI API (like Gemini, OpenAI, or Claude) sending the 'inputTxt'.
-            // You would ask the AI to return a JSON object with a Gist, an Analogy, 
-            // and an array of Takeaways.
-            
-            // For now, we are simulating a 2-second network request to show you the UI flow.
             setTimeout(() => {
                 
-                // Simulated AI Response based on whatever they pasted
+                // This is the structure you should instruct your AI backend to return:
                 const mockResponse = {
-                    gist: "This concept boils down to the idea that systems naturally move from order to disorder unless energy is applied to keep them organized.",
-                    analogy: "Think of your bedroom. If you do nothing (no energy applied), it naturally gets messy over the week (disorder). To make it clean and organized again, you have to spend energy cleaning it. This is exactly how this concept works in nature.",
+                    deepDive: "This concept fundamentally explores how closed systems react to external pressures over time. Rather than looking at isolated incidents, it requires us to understand that every action triggers a systemic re-balancing. We are not skipping details here: the core mathematical principle relies on the fact that variables A and B are inversely proportional. When external force (Pressure) increases, internal stability (Volume) decreases to maintain the system's constant energy state.",
+                    
+                    // The AI returns an array of logical steps to be mapped with arrows
+                    flowSteps: [
+                        "1. An external pressure is applied to the system.",
+                        "2. The system's internal boundaries compress.",
+                        "3. Energy density increases as space decreases.",
+                        "4. A new state of equilibrium is reached."
+                    ],
+                    
+                    analogy: "Imagine squeezing a balloon. The air inside doesn't disappear (the energy remains constant), but as you apply pressure with your hands, the space inside gets smaller, and the rubber stretches tighter. If you squeeze too hard without letting air out, it pops.",
+                    
                     takeaways: [
-                        "Order requires constant energy input.",
-                        "Disorder (entropy) is the natural state of closed systems.",
-                        "This applies to physics, biology, and even time management!"
+                        "Systems always seek a state of equilibrium.",
+                        "Internal volume and external pressure are inversely linked.",
+                        "The total energy of the closed system remains mathematically constant."
                     ]
                 };
 
-                // Populate the UI with the response
-                document.getElementById('out-gist').innerText = mockResponse.gist;
+                // 1. Populate Deep Dive
+                document.getElementById('out-deepdive').innerText = mockResponse.deepDive;
+
+                // 2. Populate Visual Flow with Block Arrows
+                const flowContainer = document.getElementById('out-flow');
+                flowContainer.innerHTML = ''; // clear old flow
+                
+                mockResponse.flowSteps.forEach((step, index) => {
+                    // Create the step box
+                    let stepBox = document.createElement('div');
+                    stepBox.className = 'flow-step';
+                    stepBox.innerText = step;
+                    flowContainer.appendChild(stepBox);
+
+                    // Add a CSS block arrow after it (unless it's the very last step)
+                    if (index < mockResponse.flowSteps.length - 1) {
+                        let arrow = document.createElement('div');
+                        arrow.className = 'block-arrow';
+                        flowContainer.appendChild(arrow);
+                    }
+                });
+
+                // 3. Populate Analogy
                 document.getElementById('out-analogy').innerText = mockResponse.analogy;
                 
+                // 4. Populate Takeaways
                 const takeawaysList = document.getElementById('out-takeaways');
-                takeawaysList.innerHTML = ''; // Clear old items
+                takeawaysList.innerHTML = ''; // clear old
                 mockResponse.takeaways.forEach(item => {
                     let li = document.createElement('li');
                     li.innerText = item;
                     takeawaysList.appendChild(li);
                 });
 
-                // Hide loader, show output, reset button
+                // Display Results
                 loader.style.display = 'none';
                 outputContainer.style.display = 'block';
                 btn.disabled = false;
-                btn.innerText = "Simplify Another Concept";
+                btn.innerText = "Explain Another Concept";
 
-            }, 2000); // 2000ms = 2 second fake delay
+            }, 2500); // 2.5 second delay
         }
     </script>
 </body>
