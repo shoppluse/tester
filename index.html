@@ -1,167 +1,136 @@
-<div class="container">
-  <h1>Hello, World!<br>ANIRUDH S A</h1>
-  <p>Start building something amazing.</p>
+
+<div class="store">
+  <header class="sh">
+    <span class="sb">🛒 ShopForge</span><input class="ss" placeholder="Search products..." data-cfs-selected="1"><button class="cart-btn" id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
+  </header>
+  <div class="sbody">
+    <main class="pgrid" id="pgrid"><div class="pc"><div class="pi">🎧</div><div class="pinfo"><div class="pn">Headphones</div><div class="pp">$129</div><button class="padd" onclick="addCart(1)">Add to Cart</button></div></div><div class="pc"><div class="pi">⌨️</div><div class="pinfo"><div class="pn">Keyboard</div><div class="pp">$219</div><button class="padd" onclick="addCart(2)">Add to Cart</button></div></div><div class="pc"><div class="pi">🖥️</div><div class="pinfo"><div class="pn">Monitor</div><div class="pp">$449</div><button class="padd" onclick="addCart(3)">Add to Cart</button></div></div><div class="pc"><div class="pi">👟</div><div class="pinfo"><div class="pn">Sneakers</div><div class="pp">$89</div><button class="padd" onclick="addCart(4)">Add to Cart</button></div></div><div class="pc"><div class="pi">⌚</div><div class="pinfo"><div class="pn">Watch</div><div class="pp">$299</div><button class="padd" onclick="addCart(5)">Add to Cart</button></div></div><div class="pc"><div class="pi">🧥</div><div class="pinfo"><div class="pn">Jacket</div><div class="pp">$179</div><button class="padd" onclick="addCart(6)">Add to Cart</button></div></div></main>
+    <aside class="cart-side" id="cartSide">
+      <div class="csh">
+        <h3>Your Cart</h3>
+        <button onclick="document.getElementById('cartSide').style.transform='translateX(100%)'">✕</button>
+      </div>
+      <div class="citems" id="citems">
+        <p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>
+      </div>
+      <div class="cfoot">
+        <div class="ctrow"><span>Total</span><strong id="ctotal">$0.00</strong></div>
+        <button class="cbtn">Checkout →</button>
+      </div>
+    </aside>
+  </div>
+</div>
+<div class="store">
+  <header class="sh">
+    <span class="sb">🛒 ShopForge</span><input class="ss" placeholder="Search products..."><button class="cart-btn" id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
+  </header>
+  <div class="sbody">
+    <main class="pgrid" id="pgrid"></main>
+    <aside class="cart-side" id="cartSide">
+      <div class="csh">
+        <h3>Your Cart</h3>
+        <button onclick="document.getElementById('cartSide').style.transform='translateX(100%)'">✕</button>
+      </div>
+      <div class="citems" id="citems">
+        <p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>
+      </div>
+      <div class="cfoot">
+        <div class="ctrow"><span>Total</span><strong id="ctotal">$0.00</strong></div>
+        <button class="cbtn">Checkout →</button>
+      </div>
+    </aside>
+  </div>
 </div>
 <script>
-  (function() {
-        const _log = console.log, _warn = console.warn, _error = console.error;
-        function send(type, args) {
-            window.parent.postMessage({ type:'console', logType:type, message:args.map(a => {
-                if(a===null) return 'null';
-                if(a===undefined) return 'undefined';
-                if(typeof a==='object') { try{return JSON.stringify(a);}catch(e){return String(a);} }
-                return String(a);
-            }).join(' ') }, '*');
-        }
-        console.log = (...a) => { _log(...a); send('log',a); };
-        console.warn = (...a) => { _warn(...a); send('warn',a); };
-        console.error = (...a) => { _error(...a); send('error',a); };
-        window.onerror = (msg,url,line) => send('error',[msg+' (line '+line+')']);
-    })();
+  (function(){
+  var _l=console.log,_w=console.warn,_e=console.error;
+  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
+  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
+  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
+  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
+  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
+})();
 </script>
 <script>
-  try { console.log('Ready to build!'); } catch(err) { console.error(err.message); }
-</script>
-
-<style>
-  #cf-builder-ui {
-    position: fixed;
-    top: 12px;
-    right: 12px;
-    background: rgba(15, 23, 42, 0.95);
-    color: #f8fafc;
-    padding: 12px;
-    border-radius: 8px;
-    z-index: 999999;
-    font-family: system-ui, sans-serif;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    width: 280px;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  #cf-builder-ui button {
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    background: #334155;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    transition: 0.2s;
-  }
-
-  #cf-builder-ui button:hover {
-    background: #475569;
-  }
-
-  #cf-builder-ui .danger-btn {
-    background: #ef4444;
-  }
-
-  #cf-builder-ui .danger-btn:hover {
-    background: #dc2626;
-  }
-
-  #cf-builder-ui input[type="color"] {
-    padding: 0;
-    border: 1px solid #475569;
-    border-radius: 4px;
-    height: 26px;
-    width: 30px;
-    cursor: pointer;
-  }
-
-  .cf-selected-element {
-    outline: 3px dashed #6366f1 !important;
-    outline-offset: -2px;
-  }
-</style>
-
-<script>
-  let selectedEl = null;
-
-        document.body.contentEditable = "true";
-        document.getElementById('cf-builder-ui').contentEditable = "false";
-
-        document.addEventListener("click", e => {
-            if (e.target.closest("#cf-builder-ui")) return;
-            if (e.target.closest("a")) e.preventDefault(); // Prevent navigating away
-
-            if (selectedEl) selectedEl.classList.remove("cf-selected-element");
-            selectedEl = e.target;
-            selectedEl.classList.add("cf-selected-element");
-        });
-
-        window.addEl = function(tag) {
-            const target = selectedEl || document.body;
-            const el = document.createElement(tag);
-            el.textContent = "New " + tag;
-            if (tag === 'div') { 
-                el.style.padding = '20px'; 
-                el.style.minHeight = '50px';
-                el.style.border = '1px dashed #ccc'; 
-            }
-            target.appendChild(el);
-        };
-
-        window.changeStyle = function(prop, val) {
-            if (selectedEl) selectedEl.style[prop] = val;
-        };
-
-        window.deleteEl = function() {
-            if (selectedEl && selectedEl !== document.body) {
-                selectedEl.remove();
-                selectedEl = null;
-            } else {
-                alert("Please select an element inside the page (cannot delete body).");
-            }
-        };
-
-        let syncTimeout;
-        const observer = new MutationObserver(() => {
-            clearTimeout(syncTimeout);
-            syncTimeout = setTimeout(() => {
-                // Clone body to strip builder UI & selection artifacts before sending to Monaco
-                const clone = document.body.cloneNode(true);
-                const ui = clone.querySelector('#cf-builder-ui');
-                if(ui) ui.remove();
-                
-                clone.querySelectorAll('.cf-selected-element').forEach(el => el.classList.remove('cf-selected-element'));
-
-                window.parent.postMessage({
-                    type: 'sync-html',
-                    html: clone.innerHTML
-                }, '*');
-            }, 400); // Debounce to prevent lag
-        });
-
-        observer.observe(document.body, { 
-            childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] 
-        });
-        console.log("🎨 Visual Builder active. Click elements to edit, text is editable.");
+  try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
+let cart=[];
+const grid=document.getElementById("pgrid");
+grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
+window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
+function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
+document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}
 </script>
 <script>
-  (function() {
-        const _log = console.log, _warn = console.warn, _error = console.error;
-        function send(type, args) {
-            window.parent.postMessage({ type:'console', logType:type, message:args.map(a => {
-                if(a===null) return 'null';
-                if(a===undefined) return 'undefined';
-                if(typeof a==='object') { try{return JSON.stringify(a);}catch(e){return String(a);} }
-                return String(a);
-            }).join(' ') }, '*');
-        }
-        console.log = (...a) => { _log(...a); send('log',a); };
-        console.warn = (...a) => { _warn(...a); send('warn',a); };
-        console.error = (...a) => { _error(...a); send('error',a); };
-        window.onerror = (msg,url,line) => send('error',[msg+' (line '+line+')']);
-    })();
+  (function(){
+  var _l=console.log,_w=console.warn,_e=console.error;
+  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
+  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
+  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
+  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
+  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
+})();
 </script>
 <script>
-  try { console.log('Ready to build!'); } catch(err) { console.error(err.message); }
+  try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
+let cart=[];
+const grid=document.getElementById("pgrid");
+grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
+window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
+function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
+document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}
 </script>
+<script>
+  (function(){
+  var _l=console.log,_w=console.warn,_e=console.error;
+  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
+  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
+  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
+  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
+  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
+})();
+</script>
+<script>
+  try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
+let cart=[];
+const grid=document.getElementById("pgrid");
+grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
+window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
+function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
+document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}
+</script>
+<script>
+  (function(){
+  var _l=console.log,_w=console.warn,_e=console.error;
+  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
+  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
+  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
+  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
+  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
+})();
+</script>
+<script>
+  try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
+let cart=[];
+const grid=document.getElementById("pgrid");
+grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
+window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
+function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
+document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}
+</script>
+<script>
+(function(){
+  var _l=console.log,_w=console.warn,_e=console.error;
+  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
+  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
+  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
+  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
+  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
+})();
+</script>
+<script>try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
+let cart=[];
+const grid=document.getElementById("pgrid");
+grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
+window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
+function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
+document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}</script>
