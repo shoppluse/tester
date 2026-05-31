@@ -1,309 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ShopForge Cart</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept Clarifier | Study Buddy</title>
+    <style>
+        /* CSS Styling */
+        :root {
+            --primary-color: #6366f1; /* Indigo */
+            --primary-hover: #4f46e5;
+            --bg-color: #f3f4f6;
+            --surface-color: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+        }
 
-    body {
-      font-family: system-ui, sans-serif;
-      background: #f8fafc;
-      color: #0f172a;
-      height: 100vh;
-      overflow: hidden;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    .store {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
 
-    .sh {
-      height: 56px;
-      background: #fff;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 20px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    }
+        .container {
+            background-color: var(--surface-color);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
 
-    .sb {
-      font-weight: 800;
-      font-size: 1.05rem;
-      white-space: nowrap;
-    }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
 
-    .ss {
-      flex: 1;
-      padding: 7px 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 7px;
-      font-size: 0.85rem;
-      outline: none;
-    }
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
 
-    .cart-btn {
-      padding: 7px 16px;
-      background: #6366f1;
-      color: #fff;
-      border: none;
-      border-radius: 7px;
-      font-weight: 700;
-      cursor: pointer;
-    }
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+            margin-bottom: 20px;
+        }
 
-    .sbody {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    }
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
 
-    .pgrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 16px;
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-      align-content: start;
-    }
+        button {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-    .pc {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.2s;
-    }
+        button:hover {
+            background-color: var(--primary-hover);
+        }
 
-    .pc:hover {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      transform: translateY(-2px);
-    }
+        button:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+        }
 
-    .pi {
-      height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      background: #f1f5f9;
-    }
+        /* Output Section */
+        #loader {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+            color: var(--primary-color);
+            font-weight: 500;
+            animation: pulse 1.5s infinite;
+        }
 
-    .pinfo {
-      padding: 12px;
-    }
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
 
-    .pn {
-      font-size: 0.85rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
+        #output-container {
+            display: none;
+            margin-top: 40px;
+            animation: fadeIn 0.5s ease;
+        }
 
-    .pp {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #6366f1;
-      margin-bottom: 8px;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .padd {
-      width: 100%;
-      padding: 7px;
-      background: #6366f1;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
+        .concept-card {
+            background-color: #f8fafc;
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 20px;
+        }
 
-    .cart-side {
-      width: 280px;
-      background: #fff;
-      border-left: 1px solid #e2e8f0;
-      display: flex;
-      flex-direction: column;
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      transform: translateX(100%);
-      transition: transform 0.3s;
-      z-index: 10;
-    }
+        .concept-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    .cart-side.open {
-      transform: none;
-    }
+        .concept-card ul {
+            padding-left: 20px;
+        }
 
-    .csh {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 18px;
-      border-bottom: 1px solid #e2e8f0;
-    }
+        .concept-card li {
+            margin-bottom: 8px;
+        }
 
-    .citems {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px 18px;
-    }
-
-    .ci {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 0.82rem;
-    }
-
-    .cfoot {
-      padding: 14px 18px;
-      border-top: 1px solid #e2e8f0;
-    }
-
-    .ctrow {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      margin-bottom: 10px;
-    }
-
-    .cbtn {
-      width: 100%;
-      padding: 10px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    /* Additional Specific Selectors */
-    div:nth-of-type(2) > div:nth-of-type(1) {
-      color: #1a44b7;
-      background-color: #7cb18f;
-    }
-
-    div > main {
-      background-color: #404f72;
-    }
-
-    div:nth-of-type(1) > div:nth-of-type(1) {
-      background-color: #7fc781;
-    }
-
-    header > input {
-      font-size: 16.6px;
-      font-weight: 400;
-      text-align: center;
-      padding: 7px 12px;
-      margin: 0px;
-      border-radius: 7px;
-      width: 272.913px;
-      height: 31.6px;
-      opacity: 1;
-    }
-  </style>
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="store">
-    <header class="sh">
-      <span class="sb">🛒 ShopForge</span>
-      <input class="ss" placeholder="Search products...">
-      <button class="cart-btn" id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
-    </header>
-    <div class="sbody">
-      <main class="pgrid" id="pgrid"></main>
-      
-      <aside class="cart-side" id="cartSide">
-        <div class="csh">
-          <h3>Your Cart</h3>
-          <button onclick="document.getElementById('cartSide').classList.remove('open')">✕</button>
-        </div>
-        <div class="citems" id="citems">
-          <p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>
-        </div>
-        <div class="cfoot">
-          <div class="ctrow"><span>Total</span><strong id="ctotal">$0.00</strong></div>
-          <button class="cbtn">Checkout →</button>
-        </div>
-      </aside>
-    </div>
-  </div>
+    <div class="container">
+        <h1>Concept Clarifier</h1>
+        <p class="subtitle">Paste any complicated textbook concept below, and I'll make it make sense.</p>
 
-  <script>
-    try {
-      const prods = [
-        {id: 1, n: "Headphones", p: 129, e: "🎧"},
-        {id: 2, n: "Keyboard", p: 219, e: "⌨️"},
-        {id: 3, n: "Monitor", p: 449, e: "🖥️"},
-        {id: 4, n: "Sneakers", p: 89, e: "👟"},
-        {id: 5, n: "Watch", p: 299, e: "⌚"},
-        {id: 6, n: "Jacket", p: 179, e: "🧥"}
-      ];
-      
-      let cart = [];
-      const grid = document.getElementById("pgrid");
-      
-      grid.innerHTML = prods.map(p => `
-        <div class="pc">
-          <div class="pi">${p.e}</div>
-          <div class="pinfo">
-            <div class="pn">${p.n}</div>
-            <div class="pp">$${p.p}</div>
-            <button class="padd" onclick="addCart(${p.id})">Add to Cart</button>
-          </div>
+        <textarea id="conceptInput" placeholder="Paste your complex concept, theory, or reading assignment here..."></textarea>
+        
+        <button id="simplifyBtn" onclick="processConcept()">Simplify & Explain</button>
+
+        <div id="loader">Analyzing and translating into student-friendly terms...</div>
+
+        <div id="output-container">
+            <div class="concept-card">
+                <h3>1. The Gist (In Plain English)</h3>
+                <p id="out-gist"></p>
+            </div>
+
+            <div class="concept-card">
+                <h3>2. The "Convincing" Analogy</h3>
+                <p id="out-analogy"></p>
+            </div>
+
+            <div class="concept-card">
+                <h3>3. Key Takeaways</h3>
+                <ul id="out-takeaways"></ul>
+            </div>
         </div>
-      `).join("");
-      
-      window.addCart = function(id) {
-        const p = prods.find(x => x.id === id);
-        const ex = cart.find(x => x.id === id);
-        ex ? ex.q++ : cart.push({...p, q: 1});
-        renderCart();
-        document.getElementById("cartSide").classList.add("open");
-      };
-      
-      function renderCart() {
-        document.getElementById("cartCount").textContent = cart.reduce((s, x) => s + x.q, 0);
-        const ci = document.getElementById("citems");
-        if (!cart.length) {
-          ci.innerHTML = '<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';
-          document.getElementById("ctotal").textContent = "$0.00";
-          return;
+    </div>
+
+    <script>
+        // JavaScript Logic
+        function processConcept() {
+            const inputTxt = document.getElementById('conceptInput').value.trim();
+            const btn = document.getElementById('simplifyBtn');
+            const loader = document.getElementById('loader');
+            const outputContainer = document.getElementById('output-container');
+
+            if (!inputTxt) {
+                alert("Please paste a concept first!");
+                return;
+            }
+
+            // Hide previous output & show loader
+            outputContainer.style.display = 'none';
+            loader.style.display = 'block';
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            // ==========================================
+            // API INTEGRATION POINT
+            // ==========================================
+            // In a real application, you would make an async fetch call here 
+            // to an AI API (like Gemini, OpenAI, or Claude) sending the 'inputTxt'.
+            // You would ask the AI to return a JSON object with a Gist, an Analogy, 
+            // and an array of Takeaways.
+            
+            // For now, we are simulating a 2-second network request to show you the UI flow.
+            setTimeout(() => {
+                
+                // Simulated AI Response based on whatever they pasted
+                const mockResponse = {
+                    gist: "This concept boils down to the idea that systems naturally move from order to disorder unless energy is applied to keep them organized.",
+                    analogy: "Think of your bedroom. If you do nothing (no energy applied), it naturally gets messy over the week (disorder). To make it clean and organized again, you have to spend energy cleaning it. This is exactly how this concept works in nature.",
+                    takeaways: [
+                        "Order requires constant energy input.",
+                        "Disorder (entropy) is the natural state of closed systems.",
+                        "This applies to physics, biology, and even time management!"
+                    ]
+                };
+
+                // Populate the UI with the response
+                document.getElementById('out-gist').innerText = mockResponse.gist;
+                document.getElementById('out-analogy').innerText = mockResponse.analogy;
+                
+                const takeawaysList = document.getElementById('out-takeaways');
+                takeawaysList.innerHTML = ''; // Clear old items
+                mockResponse.takeaways.forEach(item => {
+                    let li = document.createElement('li');
+                    li.innerText = item;
+                    takeawaysList.appendChild(li);
+                });
+
+                // Hide loader, show output, reset button
+                loader.style.display = 'none';
+                outputContainer.style.display = 'block';
+                btn.disabled = false;
+                btn.innerText = "Simplify Another Concept";
+
+            }, 2000); // 2000ms = 2 second fake delay
         }
-        ci.innerHTML = cart.map(i => `
-          <div class="ci">
-            <span>${i.e} ${i.n} ×${i.q}</span>
-            <span style="font-weight:700;color:#6366f1;">$${i.p * i.q}</span>
-          </div>
-        `).join("");
-        document.getElementById("ctotal").textContent = "$" + cart.reduce((s, x) => s + x.p * x.q, 0).toFixed(2);
-      }
-      
-      document.getElementById("cartBtn").onclick = () => document.getElementById("cartSide").classList.toggle("open");
-      
-    } catch(err) {
-      console.error(err.message);
-    }
-  </script>
+    </script>
 </body>
 </html>
