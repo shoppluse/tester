@@ -1,541 +1,1692 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concept Clarifier Premium</title>
-    <!-- Premium Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* CSS Variables & Theming */
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-gradient: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%);
-            --surface: rgba(255, 255, 255, 0.9);
-            --surface-solid: #ffffff;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --accent: #e0e7ff;
-            --shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
-            --success: #10b981;
-            --danger: #ef4444;
-            transition: background 0.3s, color 0.3s;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyDesk — Your Personal Study Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #181b24;
+  --surface2: #1f2333;
+  --surface3: #252a3a;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8eaf0;
+  --text-dim: #8b8fa8;
+  --text-faint: #4a4e66;
+  --green: #4ade80;
+  --green-dim: rgba(74,222,128,0.12);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96,165,250,0.12);
+  --amber: #fbbf24;
+  --amber-dim: rgba(251,191,36,0.12);
+  --rose: #f87171;
+  --rose-dim: rgba(248,113,113,0.12);
+  --violet: #a78bfa;
+  --violet-dim: rgba(167,139,250,0.12);
+  --r: 14px;
+  --rs: 10px;
+}
 
-        [data-theme="dark"] {
-            --primary: #6366f1;
-            --primary-hover: #818cf8;
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --surface: rgba(30, 41, 59, 0.8);
-            --surface-solid: #1e293b;
-            --text-dark: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --accent: #312e81;
-            --shadow: 0 20px 40px -15px rgba(0,0,0,0.4);
-        }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Sora', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-        body {
-            background: var(--bg-gradient);
-            color: var(--text-dark);
-            line-height: 1.7;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-        }
+/* NOISE TEXTURE */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0;
+}
 
-        /* Layout & Containers */
-        .app-wrapper {
-            max-width: 900px;
-            width: 100%;
-        }
+/* TOP GLOW */
+body::after {
+  content: '';
+  position: fixed; top: -200px; left: 50%;
+  transform: translateX(-50%);
+  width: 700px; height: 400px;
+  background: radial-gradient(ellipse, rgba(96,165,250,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+/* ——— LAYOUT ——— */
+.app { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 20px 60px; }
 
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            background: -webkit-linear-gradient(45deg, var(--primary), #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+/* ——— HEADER ——— */
+.header {
+  padding: 40px 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
 
-        .theme-toggle {
-            background: var(--surface-solid);
-            border: 1px solid var(--border);
-            color: var(--text-dark);
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
+.header-left h1 {
+  font-family: 'Lora', serif;
+  font-size: 1.7rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-        .theme-toggle:hover {
-            transform: scale(1.1);
-        }
+.header-left h1 span { color: var(--blue); }
 
-        .main-card {
-            background: var(--surface);
-            backdrop-filter: blur(12px);
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
+.header-left p {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-weight: 300;
+}
 
-        /* Input Area */
-        .input-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
+.streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--amber-dim);
+  border: 1px solid rgba(251,191,36,0.2);
+  border-radius: 100px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
+}
 
-        textarea {
-            width: 100%;
-            height: 180px;
-            padding: 20px;
-            font-size: 1rem;
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            resize: vertical;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-            background-color: var(--surface-solid);
-            color: var(--text-dark);
-        }
+/* ——— TAB NAV ——— */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 5px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
 
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px var(--accent);
-        }
+.tabs::-webkit-scrollbar { display: none; }
 
-        /* Buttons */
-        .btn-primary {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
-            color: white;
-            border: none;
-            padding: 18px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 20px -10px var(--primary);
-        }
+.tab {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px 14px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--rs);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px -10px var(--primary);
-        }
+.tab:hover { color: var(--text); background: var(--surface2); }
 
-        .btn-primary:disabled {
-            background: var(--text-muted);
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-        }
+.tab.active {
+  background: var(--surface3);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
 
-        .action-row {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-            justify-content: flex-end;
-        }
+.tab-emoji { font-size: 15px; }
 
-        .btn-secondary {
-            background: var(--surface-solid);
-            color: var(--text-dark);
-            border: 1px solid var(--border);
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
+/* ——— PANELS ——— */
+.panel { display: none; animation: fadeIn 0.25s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-        .btn-secondary:hover {
-            background: var(--accent);
-            border-color: var(--primary);
-        }
+/* ——— CARDS ——— */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  margin-bottom: 16px;
+}
 
-        /* Loader */
-        .loader-container {
-            display: none;
-            text-align: center;
-            margin: 40px 0;
-        }
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--accent);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px auto;
-        }
+.card-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 12px;
+  border-radius: 2px;
+  background: var(--blue);
+}
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+/* ——— INPUTS ——— */
+textarea, input[type=text] {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--rs);
+  padding: 14px 16px;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  line-height: 1.7;
+}
 
-        /* Output Sections */
-        #output-wrapper { display: none; }
+textarea:focus, input[type=text]:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(96,165,250,0.1);
+}
 
-        .section-card {
-            background-color: var(--surface-solid);
-            border: 1px solid var(--border);
-            padding: 30px;
-            border-radius: 16px;
-            margin-top: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            opacity: 0;
-            transform: translateY(20px);
-        }
+textarea::placeholder, input::placeholder { color: var(--text-faint); }
 
-        .animate-in {
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+/* ——— BUTTONS ——— */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 20px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--rs);
+  cursor: pointer;
+  transition: all 0.18s;
+}
 
-        @keyframes slideUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
+.btn-primary { background: var(--blue); color: #0a0f1e; }
+.btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-        .section-card h3 {
-            color: var(--text-dark);
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 10px;
-        }
+.btn-green { background: var(--green); color: #041a0c; }
+.btn-green:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-        .section-card h3 svg { color: var(--primary); }
+.btn-ghost {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--text-dim); }
 
-        /* Flowchart logic */
-        .flow-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 20px 0;
-        }
+.btn-danger { background: var(--rose-dim); border: 1px solid rgba(248,113,113,0.25); color: var(--rose); }
+.btn-danger:hover { background: rgba(248,113,113,0.2); }
 
-        .flow-step {
-            background-color: var(--accent);
-            color: var(--text-dark);
-            padding: 18px 25px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-align: center;
-            width: 100%;
-            max-width: 550px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
+.btn-sm { padding: 7px 13px; font-size: 12px; }
 
-        .block-arrow {
-            width: 0; height: 0; 
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 20px solid var(--primary);
-            margin: 10px 0;
-        }
+/* ============================================
+   TOOL 1 — NOTES ORGANISER
+   ============================================ */
+.notes-grid { display: grid; grid-template-columns: 280px 1fr; gap: 16px; min-height: 500px; }
 
-        .takeaways-list { padding-left: 25px; }
-        .takeaways-list li { margin-bottom: 12px; font-weight: 500; }
+@media (max-width: 650px) { .notes-grid { grid-template-columns: 1fr; } }
 
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
+.notes-sidebar { display: flex; flex-direction: column; gap: 8px; }
 
-        .toast {
-            background: var(--text-dark);
-            color: var(--surface-solid);
-            padding: 12px 24px;
-            border-radius: 8px;
-            margin-top: 10px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideInRight 0.3s ease;
-        }
+.notes-sidebar-top {
+  display: flex; gap: 8px; margin-bottom: 4px;
+}
 
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+.notes-sidebar-top input { flex: 1; padding: 9px 12px; font-size: 13px; }
+.notes-sidebar-top .btn { padding: 9px 14px; }
 
-        /* SVG Utilities */
-        .icon { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.note-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.18s;
+  position: relative;
+}
 
-        @media (max-width: 768px) {
-            .main-card { padding: 25px; }
-            .header h1 { font-size: 1.5rem; }
-        }
-    </style>
+.note-item:hover { border-color: var(--border2); background: var(--surface3); }
+.note-item.active { border-color: var(--blue); background: var(--blue-dim); }
+
+.note-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 24px;
+}
+
+.note-item-preview {
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-item-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-faint);
+  margin-top: 5px;
+}
+
+.note-del {
+  position: absolute; top: 10px; right: 10px;
+  background: none; border: none;
+  color: var(--text-faint); cursor: pointer;
+  font-size: 14px; padding: 2px 4px;
+  border-radius: 4px; opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+.note-item:hover .note-del { opacity: 1; }
+.note-del:hover { color: var(--rose); }
+
+.notes-editor { display: flex; flex-direction: column; gap: 10px; }
+
+.notes-editor input[type=text] {
+  font-size: 16px; font-weight: 600;
+  padding: 12px 16px;
+  background: var(--surface2);
+}
+
+.notes-editor textarea { flex: 1; min-height: 380px; font-size: 14px; }
+
+.notes-toolbar {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+
+.notes-word-count {
+  font-size: 11px; color: var(--text-faint);
+  font-family: 'JetBrains Mono', monospace;
+  margin-left: auto;
+}
+
+.empty-state {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 300px; color: var(--text-faint);
+  text-align: center; gap: 12px;
+}
+.empty-state .es-icon { font-size: 40px; opacity: 0.4; }
+.empty-state p { font-size: 14px; }
+
+/* ============================================
+   TOOL 2 — FLASHCARDS
+   ============================================ */
+.fc-controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.fc-controls input { flex: 2; min-width: 160px; }
+.fc-controls textarea { flex: 2; min-width: 160px; min-height: 70px; }
+
+.fc-add-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media(max-width:600px) { .fc-add-form { grid-template-columns: 1fr; } }
+
+.fc-add-form textarea { min-height: 80px; }
+
+.fc-add-actions { grid-column: 1/-1; display: flex; gap: 8px; }
+
+/* Deck selector */
+.deck-row { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+
+.deck-chip {
+  padding: 6px 14px;
+  font-size: 12px; font-weight: 600;
+  border-radius: 100px;
+  border: 1.5px solid var(--border2);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: 'Sora', sans-serif;
+}
+.deck-chip:hover { border-color: var(--blue); color: var(--blue); }
+.deck-chip.active { background: var(--blue); color: #0a0f1e; border-color: var(--blue); }
+
+/* Flashcard study area */
+.fc-study-area { text-align: center; margin: 24px 0; }
+
+.fc-card-wrap {
+  perspective: 1200px;
+  width: 100%; max-width: 540px;
+  height: 240px;
+  margin: 0 auto 20px;
+  cursor: pointer;
+}
+
+.fc-card-inner {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.fc-card-inner.flipped { transform: rotateY(180deg); }
+
+.fc-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--r);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 28px;
+  border: 1px solid var(--border2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.fc-front {
+  background: var(--surface2);
+  border-top: 3px solid var(--blue);
+}
+
+.fc-back {
+  background: var(--surface2);
+  border-top: 3px solid var(--green);
+  transform: rotateY(180deg);
+}
+
+.fc-face-label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 12px;
+}
+
+.fc-face-text {
+  font-family: 'Lora', serif;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text);
+  text-align: center;
+}
+
+.fc-hint { font-size: 12px; color: var(--text-faint); margin-top: 8px; }
+
+.fc-nav { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+.fc-nav-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: var(--rs);
+  padding: 10px 20px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.18s;
+}
+.fc-nav-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+.fc-progress-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--text-faint);
+  min-width: 60px; text-align: center;
+}
+
+.fc-score-row { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+
+.fc-score-btn {
+  padding: 9px 22px;
+  border-radius: 100px;
+  border: none;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s;
+}
+
+.score-good { background: var(--green-dim); color: var(--green); border: 1.5px solid rgba(74,222,128,0.3); }
+.score-good:hover { background: rgba(74,222,128,0.2); }
+.score-bad  { background: var(--rose-dim);  color: var(--rose);  border: 1.5px solid rgba(248,113,113,0.3); }
+.score-bad:hover  { background: rgba(248,113,113,0.2); }
+
+.fc-stats {
+  display: flex; gap: 12px; justify-content: center; margin-top: 12px; flex-wrap: wrap;
+}
+
+.fc-stat {
+  font-size: 12px; color: var(--text-faint);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 4px 12px;
+}
+.fc-stat strong { color: var(--text); }
+
+/* Card list */
+.fc-list { display: grid; gap: 8px; margin-top: 16px; }
+
+.fc-list-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fc-list-q { flex: 1; font-size: 13px; color: var(--text); }
+.fc-list-a { flex: 1; font-size: 12px; color: var(--text-dim); font-style: italic; }
+.fc-list-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 16px; padding: 4px; border-radius: 4px; }
+.fc-list-del:hover { color: var(--rose); }
+
+/* ============================================
+   TOOL 3 — TIMER / POMODORO
+   ============================================ */
+.timer-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+@media(max-width:650px) { .timer-layout { grid-template-columns: 1fr; } }
+
+.timer-main { text-align: center; }
+
+.timer-modes { display: flex; gap: 6px; justify-content: center; margin-bottom: 28px; }
+
+.tmode-btn {
+  padding: 8px 16px;
+  font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border2);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  transition: all 0.18s;
+}
+.tmode-btn:hover { border-color: var(--blue); color: var(--blue); }
+.tmode-btn.active { background: var(--blue); color: #0a0f1e; border-color: var(--blue); }
+
+.timer-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(4rem, 12vw, 7rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin: 10px 0;
+  transition: color 0.5s;
+  line-height: 1;
+}
+
+.timer-display.running { color: var(--blue); }
+.timer-display.paused  { color: var(--amber); }
+.timer-display.break   { color: var(--green); }
+
+.timer-label {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 28px;
+}
+
+.timer-ring-wrap {
+  position: relative;
+  width: 240px; height: 240px;
+  margin: 0 auto 28px;
+}
+
+.timer-ring-wrap svg {
+  position: absolute; inset: 0;
+  transform: rotate(-90deg);
+}
+
+.timer-ring-bg { fill: none; stroke: var(--surface3); stroke-width: 4; }
+.timer-ring-fg { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
+
+.timer-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+
+.timer-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; }
+
+.timer-session-count {
+  display: flex; gap: 6px; justify-content: center; margin-bottom: 16px;
+}
+.session-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--surface3);
+  border: 1.5px solid var(--text-faint);
+  transition: all 0.3s;
+}
+.session-dot.done { background: var(--blue); border-color: var(--blue); }
+
+.timer-task {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--rs);
+  padding: 10px 14px;
+  font-size: 13px;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* Timer log */
+.timer-log { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; }
+.log-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 10px 14px;
+  font-size: 13px;
+}
+.log-item-task { color: var(--text); font-weight: 500; }
+.log-item-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text-faint);
+  margin-top: 4px;
+}
+
+/* ============================================
+   TOOL 4 — QUIZ BUILDER
+   ============================================ */
+.quiz-setup { margin-bottom: 20px; }
+.quiz-q-add { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 16px; }
+.quiz-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media(max-width:550px) { .quiz-options-grid { grid-template-columns: 1fr; } }
+
+.option-row { display: flex; gap: 8px; align-items: center; }
+.option-radio {
+  width: 18px; height: 18px;
+  accent-color: var(--green);
+  cursor: pointer; flex-shrink: 0;
+  margin-top: 0;
+}
+.option-row input { flex: 1; padding: 9px 12px; font-size: 13px; }
+
+.correct-label {
+  font-size: 11px; color: var(--text-faint);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+/* Quiz question list */
+.quiz-q-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+
+.quiz-q-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 14px 16px;
+}
+
+.quiz-q-text { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+
+.quiz-opts-list { display: flex; flex-direction: column; gap: 4px; }
+
+.quiz-opt {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 4px 0;
+  display: flex; gap: 6px; align-items: center;
+}
+.quiz-opt.correct { color: var(--green); }
+.quiz-opt.correct::before { content: '✓'; font-weight: 700; }
+.quiz-opt:not(.correct)::before { content: '○'; }
+
+/* Quiz play mode */
+.quiz-play { display: none; }
+.quiz-play.active { display: block; }
+
+.quiz-play-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.quiz-progress-bar {
+  flex: 1; height: 4px;
+  background: var(--surface3);
+  border-radius: 2px;
+  margin: 0 16px;
+  overflow: hidden;
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.quiz-q-display {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  padding: 28px;
+  margin-bottom: 16px;
+  min-height: 100px;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+}
+
+.quiz-q-display p {
+  font-family: 'Lora', serif;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.quiz-options-play { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+@media(max-width:550px) { .quiz-options-play { grid-template-columns: 1fr; } }
+
+.quiz-opt-btn {
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--rs);
+  padding: 14px 16px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s;
+  line-height: 1.5;
+}
+.quiz-opt-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); }
+.quiz-opt-btn.correct { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+.quiz-opt-btn.wrong   { border-color: var(--rose);  background: var(--rose-dim);  color: var(--rose); }
+.quiz-opt-btn:disabled { cursor: default; }
+
+.quiz-feedback {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 24px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.quiz-results {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.quiz-score-circle {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  border: 3px solid var(--blue);
+  background: var(--blue-dim);
+}
+
+.quiz-score-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1;
+}
+
+.quiz-score-label { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+
+/* ============================================
+   COMMON
+   ============================================ */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.tag {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.tag-blue { background: var(--blue-dim); color: var(--blue); }
+.tag-green { background: var(--green-dim); color: var(--green); }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+
+select {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--rs);
+  padding: 9px 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+</style>
 </head>
 <body>
 
-    <div class="app-wrapper">
-        <header class="header">
-            <h1>
-                <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                Concept Clarifier Pro
-            </h1>
-            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
-                <svg id="theme-icon" class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </button>
-        </header>
+<div class="app">
 
-        <main class="main-card">
-            <div class="input-header">
-                <span>Paste your complex concept below</span>
-                <span id="char-count">0 chars</span>
-            </div>
-            
-            <textarea id="conceptInput" placeholder="Enter textbook text, lecture notes, or a confusing theory..." oninput="updateCharCount()"></textarea>
-            
-            <button id="simplifyBtn" class="btn-primary" onclick="handleProcess()">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <span>Analyze & Simplify</span>
-            </button>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Study<span>Desk</span></h1>
+      <p>Notes · Flashcards · Timer · Quizzes — all in one tab</p>
+    </div>
+    <div class="streak-badge" id="streakBadge">🔥 <span id="streakNum">0</span> day streak</div>
+  </div>
 
-            <!-- Loading State -->
-            <div id="loader" class="loader-container">
-                <div class="spinner"></div>
-                <p style="color: var(--text-muted); font-weight: 500;">Synthesizing complex information...</p>
-            </div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('notes',this)"><span class="tab-emoji">📝</span> Notes</button>
+    <button class="tab" onclick="switchTab('flash',this)"><span class="tab-emoji">🃏</span> Flashcards</button>
+    <button class="tab" onclick="switchTab('timer',this)"><span class="tab-emoji">⏱</span> Timer</button>
+    <button class="tab" onclick="switchTab('quiz',this)"><span class="tab-emoji">🧠</span> Quiz</button>
+  </div>
 
-            <!-- Results State -->
-            <div id="output-wrapper">
-                
-                <div class="section-card" id="card-1">
-                    <h3><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> The Deep Dive</h3>
-                    <p id="out-deepdive"></p>
-                </div>
+  <!-- ================================================================
+       PANEL 1: NOTES
+       ================================================================ -->
+  <div class="panel active" id="panel-notes">
+    <div class="notes-grid">
 
-                <div class="section-card" id="card-2">
-                    <h3><svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> Logic Flow</h3>
-                    <div class="flow-container" id="out-flow"></div>
-                </div>
+      <!-- Sidebar -->
+      <div>
+        <div class="notes-sidebar-top">
+          <input type="text" id="newNoteSubject" placeholder="Subject…">
+          <button class="btn btn-primary btn-sm" onclick="createNote()">＋</button>
+        </div>
+        <div id="notesList" class="notes-sidebar">
+          <!-- notes injected here -->
+        </div>
+      </div>
 
-                <div class="section-card" id="card-3">
-                    <h3><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> The Analogy</h3>
-                    <p id="out-analogy"></p>
-                </div>
+      <!-- Editor -->
+      <div class="notes-editor" id="notesEditorArea">
+        <div class="empty-state" id="notesEmptyState">
+          <div class="es-icon">📒</div>
+          <p>Select a note or create a new one</p>
+        </div>
+        <div id="notesEditor" style="display:none; display:flex; flex-direction:column; gap:10px; height:100%;">
+          <input type="text" id="noteTitle" placeholder="Note title…" oninput="saveActiveNote()" style="font-size:16px;font-weight:600;">
+          <div class="notes-toolbar">
+            <button class="btn btn-ghost btn-sm" onclick="insertMd('**','**')"><b>B</b></button>
+            <button class="btn btn-ghost btn-sm" onclick="insertMd('*','*')"><i>I</i></button>
+            <button class="btn btn-ghost btn-sm" onclick="insertMd('\n# ','')">H1</button>
+            <button class="btn btn-ghost btn-sm" onclick="insertMd('\n## ','')">H2</button>
+            <button class="btn btn-ghost btn-sm" onclick="insertMd('\n- ','')">List</button>
+            <button class="btn btn-ghost btn-sm" onclick="insertMd('\n> ','')">Quote</button>
+            <button class="btn btn-ghost btn-sm" onclick="insertMd('`','`')">Code</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleNotePreview()">👁 Preview</button>
+            <span class="notes-word-count" id="wordCount">0 words</span>
+          </div>
+          <textarea id="noteBody" placeholder="Start writing your notes…" oninput="saveActiveNote(); updateWordCount();" style="flex:1;min-height:360px;"></textarea>
+          <div id="notePreview" style="display:none; flex:1; min-height:360px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--rs); padding:16px; overflow-y:auto; font-size:14px; line-height:1.8; color:var(--text);"></div>
+          <div class="row">
+            <span id="noteSubjectTag" class="tag tag-blue"></span>
+            <span id="noteSavedAt" style="font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;margin-left:auto;"></span>
+          </div>
+        </div>
+      </div>
 
-                <div class="section-card" id="card-4">
-                    <h3><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Key Takeaways</h3>
-                    <ul class="takeaways-list" id="out-takeaways"></ul>
-                </div>
+    </div>
+  </div>
 
-                <div class="action-row">
-                    <button class="btn-secondary" onclick="copyResults()">
-                        <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        Copy Notes
-                    </button>
-                    <button class="btn-secondary" onclick="downloadTxt()">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        Save .txt
-                    </button>
-                </div>
-            </div>
-        </main>
+  <!-- ================================================================
+       PANEL 2: FLASHCARDS
+       ================================================================ -->
+  <div class="panel" id="panel-flash">
+
+    <!-- Add card form -->
+    <div class="card">
+      <div class="card-title">Add Flashcard</div>
+      <div class="fc-add-form">
+        <textarea id="fcQuestion" placeholder="Front — Question or term…"></textarea>
+        <textarea id="fcAnswer"   placeholder="Back — Answer or definition…"></textarea>
+        <div class="fc-add-actions">
+          <select id="fcDeckSelect"></select>
+          <input type="text" id="fcNewDeck" placeholder="New deck name…" style="max-width:160px;">
+          <button class="btn btn-primary" onclick="addFlashcard()">＋ Add Card</button>
+        </div>
+      </div>
     </div>
 
-    <!-- Toast Notifications Container -->
-    <div id="toast-container"></div>
+    <!-- Study area -->
+    <div class="card" id="fc-study-card">
+      <div class="card-title" style="justify-content:space-between; display:flex; align-items:center;">
+        <span>Study Mode</span>
+        <div class="deck-row" id="deckRow" style="margin:0;"></div>
+      </div>
 
-    <script>
-        // --- 1. UTILITY FUNCTIONS ---
-        function toggleTheme() {
-            const body = document.body;
-            const themeIcon = document.getElementById('theme-icon');
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>'; // Moon
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'; // Sun
-            }
-        }
+      <div id="fc-study-content">
+        <div class="empty-state" id="fcEmptyState">
+          <div class="es-icon">🃏</div>
+          <p>Add some flashcards above to start studying</p>
+        </div>
+        <div id="fcStudyArea" style="display:none;">
+          <div class="fc-study-area">
+            <div class="fc-card-wrap" onclick="flipCard()">
+              <div class="fc-card-inner" id="fcCardInner">
+                <div class="fc-face fc-front">
+                  <div class="fc-face-label">Question</div>
+                  <div class="fc-face-text" id="fcFrontText"></div>
+                  <div class="fc-hint">Tap to flip</div>
+                </div>
+                <div class="fc-face fc-back">
+                  <div class="fc-face-label">Answer</div>
+                  <div class="fc-face-text" id="fcBackText"></div>
+                </div>
+              </div>
+            </div>
 
-        function updateCharCount() {
-            const text = document.getElementById('conceptInput').value;
-            document.getElementById('char-count').innerText = `${text.length} chars`;
-        }
+            <div class="fc-nav">
+              <button class="fc-nav-btn" onclick="prevCard()">← Prev</button>
+              <span class="fc-progress-text" id="fcProgress">0 / 0</span>
+              <button class="fc-nav-btn" onclick="nextCard()">Next →</button>
+            </div>
 
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> ${message}`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3000);
-        }
+            <div class="fc-score-row" id="fcScoreRow" style="display:none;">
+              <button class="fc-score-btn score-bad" onclick="markCard(false)">✗ Again</button>
+              <button class="fc-score-btn score-good" onclick="markCard(true)">✓ Got it</button>
+            </div>
 
-        // --- 2. EXPORT FUNCTIONS ---
-        function copyResults() {
-            const textToCopy = `
-DEEP DIVE:
-${document.getElementById('out-deepdive').innerText}
+            <div class="fc-stats" id="fcStats">
+              <span class="fc-stat">✓ <strong id="fcGot">0</strong> got it</span>
+              <span class="fc-stat">✗ <strong id="fcMiss">0</strong> again</span>
+              <span class="fc-stat">📚 <strong id="fcTotal">0</strong> total</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-ANALOGY:
-${document.getElementById('out-analogy').innerText}
-            `.trim();
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showToast("Notes copied to clipboard!");
-            });
-        }
+    <!-- Card list -->
+    <div class="card">
+      <div class="section-title">
+        All Cards
+        <button class="btn btn-ghost btn-sm" onclick="shuffleDeck()">🔀 Shuffle</button>
+      </div>
+      <div id="fcList" class="fc-list"></div>
+    </div>
 
-        function downloadTxt() {
-            const content = `CONCEPT CLARIFIER NOTES\n\n${document.getElementById('out-deepdive').innerText}\n\nANALOGY:\n${document.getElementById('out-analogy').innerText}`;
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Study_Notes.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast("File downloaded successfully.");
-        }
+  </div>
 
-        // --- 3. MAIN LOGIC & API INTEGRATION ---
-        
-        // This function simulates the API call. 
-        // To use a real API, replace the contents of this function with a real fetch() request.
-        async function fetchAIAnalysis(inputText) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve({
-                        deepDive: "This concept fundamentally explores how closed systems react to external pressures over time. Rather than looking at isolated incidents, it requires us to understand that every action triggers a systemic re-balancing. We are not skipping details here: the core mathematical principle relies on the fact that variables A and B are inversely proportional.",
-                        flowSteps: [
-                            "1. External pressure is applied.",
-                            "2. Internal boundaries compress to compensate.",
-                            "3. Energy density increases dramatically.",
-                            "4. A new equilibrium state is achieved."
-                        ],
-                        analogy: "Imagine squeezing a balloon. The air inside doesn't disappear, but as you apply pressure with your hands, the space inside gets smaller, and the rubber stretches tighter.",
-                        takeaways: [
-                            "Systems always seek a state of equilibrium.",
-                            "Internal volume and external pressure are inversely linked.",
-                            "Energy remains mathematically constant."
-                        ]
-                    });
-                }, 2000); // 2 second simulated API delay
-            });
-        }
+  <!-- ================================================================
+       PANEL 3: TIMER
+       ================================================================ -->
+  <div class="panel" id="panel-timer">
+    <div class="timer-layout">
 
-        async function handleProcess() {
-            const inputTxt = document.getElementById('conceptInput').value.trim();
-            const btn = document.getElementById('simplifyBtn');
-            const loader = document.getElementById('loader');
-            const outputWrapper = document.getElementById('output-wrapper');
-            const cards = [document.getElementById('card-1'), document.getElementById('card-2'), document.getElementById('card-3'), document.getElementById('card-4')];
+      <div class="timer-main">
+        <div class="timer-modes">
+          <button class="tmode-btn active" onclick="setTimerMode('pomo',this)">Pomodoro</button>
+          <button class="tmode-btn" onclick="setTimerMode('short',this)">Short Break</button>
+          <button class="tmode-btn" onclick="setTimerMode('long',this)">Long Break</button>
+          <button class="tmode-btn" onclick="setTimerMode('custom',this)">Custom</button>
+        </div>
 
-            if (!inputTxt) {
-                showToast("Please enter a concept first!");
-                return;
-            }
+        <div class="timer-ring-wrap">
+          <svg viewBox="0 0 240 240" width="240" height="240">
+            <circle class="timer-ring-bg" cx="120" cy="120" r="108"/>
+            <circle class="timer-ring-fg" id="timerRing" cx="120" cy="120" r="108"
+              stroke="#60a5fa"
+              stroke-dasharray="678.6"
+              stroke-dashoffset="0"/>
+          </svg>
+          <div class="timer-center">
+            <div class="timer-label" id="timerLabel">FOCUS</div>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+          </div>
+        </div>
 
-            // Reset UI
-            outputWrapper.style.display = 'none';
-            cards.forEach(card => card.classList.remove('animate-in'));
-            loader.style.display = 'block';
-            btn.disabled = true;
-            btn.innerHTML = '<svg class="icon spinner" style="width:20px;height:20px;border-width:2px;margin:0" viewBox="0 0 24 24"></svg> Processing...';
+        <div class="timer-session-count" id="sessionDots"></div>
 
-            try {
-                // Fetch data (Simulated or Real)
-                const data = await fetchAIAnalysis(inputTxt);
+        <div class="timer-btns">
+          <button class="btn btn-ghost" onclick="resetTimer()">↺ Reset</button>
+          <button class="btn btn-primary" id="timerStartBtn" onclick="toggleTimer()">▶ Start</button>
+          <button class="btn btn-ghost" onclick="skipTimer()">⏭ Skip</button>
+        </div>
 
-                // Populate UI
-                document.getElementById('out-deepdive').innerText = data.deepDive;
-                document.getElementById('out-analogy').innerText = data.analogy;
-                
-                // Populate Flow
-                const flowContainer = document.getElementById('out-flow');
-                flowContainer.innerHTML = ''; 
-                data.flowSteps.forEach((step, index) => {
-                    let stepBox = document.createElement('div');
-                    stepBox.className = 'flow-step';
-                    stepBox.innerText = step;
-                    flowContainer.appendChild(stepBox);
-                    if (index < data.flowSteps.length - 1) {
-                        let arrow = document.createElement('div');
-                        arrow.className = 'block-arrow';
-                        flowContainer.appendChild(arrow);
-                    }
-                });
+        <div style="margin-top:16px;">
+          <input type="text" id="timerTask" class="timer-task" placeholder="What are you working on?">
+        </div>
 
-                // Populate Takeaways
-                const takeawaysList = document.getElementById('out-takeaways');
-                takeawaysList.innerHTML = '';
-                data.takeaways.forEach(item => {
-                    let li = document.createElement('li');
-                    li.innerText = item;
-                    takeawaysList.appendChild(li);
-                });
+        <div id="customTimeRow" style="display:none; margin-top:12px; text-align:center; gap:8px; justify-content:center;" class="row">
+          <label style="font-size:13px;color:var(--text-dim);">Minutes:</label>
+          <input type="number" id="customMinutes" value="45" min="1" max="180"
+            style="width:70px; text-align:center;" onchange="applyCustomTime()">
+        </div>
+      </div>
 
-                // Staggered Reveal Animation
-                loader.style.display = 'none';
-                outputWrapper.style.display = 'block';
-                
-                cards.forEach((card, index) => {
-                    setTimeout(() => {
-                        card.classList.add('animate-in');
-                    }, index * 200); // 200ms delay between each card appearing
-                });
+      <div>
+        <div class="card">
+          <div class="section-title">Today's Sessions</div>
+          <div id="timerLog" class="timer-log">
+            <div style="font-size:13px;color:var(--text-faint);text-align:center;padding:20px;">No sessions yet today</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-                showToast("Analysis complete!");
+  <!-- ================================================================
+       PANEL 4: QUIZ BUILDER
+       ================================================================ -->
+  <div class="panel" id="panel-quiz">
 
-            } catch (error) {
-                showToast("Error analyzing concept. Please try again.");
-                console.error(error);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Analyze Another Concept';
-            }
-        }
-    </script>
+    <!-- Build mode -->
+    <div id="quizBuild">
+      <div class="card">
+        <div class="card-title">Add Question</div>
+        <div class="quiz-q-add">
+          <textarea id="quizQText" placeholder="Question text…" style="min-height:80px;"></textarea>
+          <div>
+            <div class="correct-label">Options — select the correct answer with the radio button</div>
+            <div class="quiz-options-grid" id="quizOptsInput">
+              <!-- generated by JS -->
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" onclick="addQuizQuestion()">＋ Add Question</button>
+            <button class="btn btn-ghost btn-sm" onclick="addMoreOption()">＋ Option</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          Question Bank (<span id="qCount">0</span>)
+          <button class="btn btn-green" id="startQuizBtn" onclick="startQuiz()" style="display:none;">▶ Start Quiz</button>
+        </div>
+        <div id="quizQList" class="quiz-q-list">
+          <div style="font-size:13px;color:var(--text-faint);text-align:center;padding:20px;">No questions yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Play mode -->
+    <div id="quizPlay" class="quiz-play">
+      <div class="quiz-play-header">
+        <span style="font-size:13px;font-weight:600;color:var(--text-dim);" id="quizPlayCount">Q 1 / 5</span>
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgressFill" style="width:0%"></div></div>
+        <button class="btn btn-ghost btn-sm" onclick="endQuiz()">✕ Exit</button>
+      </div>
+
+      <div class="quiz-q-display"><p id="quizPlayQ"></p></div>
+
+      <div class="quiz-options-play" id="quizPlayOpts"></div>
+
+      <div class="quiz-feedback" id="quizFeedback"></div>
+
+      <div style="text-align:center;">
+        <button class="btn btn-primary" id="quizNextBtn" onclick="nextQuizQ()" style="display:none;">Next →</button>
+      </div>
+
+      <!-- Results -->
+      <div class="quiz-results" id="quizResults" style="display:none;">
+        <div class="quiz-score-circle">
+          <div class="quiz-score-num" id="quizScoreNum">0%</div>
+          <div class="quiz-score-label">Score</div>
+        </div>
+        <div style="font-size:1.1rem;font-family:'Lora',serif;color:var(--text);margin-bottom:8px;" id="quizResultMsg"></div>
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:24px;" id="quizResultSub"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="startQuiz()">↺ Retake</button>
+          <button class="btn btn-ghost" onclick="endQuiz()">Back to Builder</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ===================================================
+// STORAGE HELPERS
+// ===================================================
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem('sd_'+k)); } catch(e){return null;} },
+  set: (k,v) => localStorage.setItem('sd_'+k, JSON.stringify(v)),
+};
+
+// ===================================================
+// TAB SYSTEM
+// ===================================================
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===================================================
+// STREAK
+// ===================================================
+function updateStreak() {
+  const today = new Date().toDateString();
+  const last  = S.get('lastVisit');
+  let streak  = S.get('streak') || 0;
+  if (last !== today) {
+    const yesterday = new Date(Date.now()-86400000).toDateString();
+    streak = (last === yesterday) ? streak + 1 : 1;
+    S.set('streak', streak);
+    S.set('lastVisit', today);
+  }
+  document.getElementById('streakNum').textContent = streak;
+}
+updateStreak();
+
+// ===================================================
+// 1. NOTES
+// ===================================================
+let notes = S.get('notes') || [];
+let activeNoteId = null;
+let previewMode = false;
+
+function renderNotesList() {
+  const el = document.getElementById('notesList');
+  if (!notes.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-faint);padding:10px 0;">No notes yet</div>';
+    return;
+  }
+  el.innerHTML = notes.map(n => `
+    <div class="note-item ${n.id===activeNoteId?'active':''}" onclick="openNote('${n.id}')">
+      <div class="note-item-title">${escHtml(n.title||'Untitled')}</div>
+      <div class="note-item-preview">${escHtml((n.body||'').slice(0,60))}</div>
+      <div class="note-item-date">${n.subject ? '📁 '+escHtml(n.subject)+' · ' : ''}${n.savedAt||''}</div>
+      <button class="note-del" onclick="deleteNote(event,'${n.id}')">×</button>
+    </div>`).join('');
+}
+
+function createNote() {
+  const subject = document.getElementById('newNoteSubject').value.trim() || 'General';
+  const n = { id: uid(), title: 'Untitled Note', body: '', subject, savedAt: timeStr() };
+  notes.unshift(n);
+  S.set('notes', notes);
+  renderNotesList();
+  openNote(n.id);
+  document.getElementById('newNoteSubject').value = '';
+}
+
+function openNote(id) {
+  activeNoteId = id;
+  const n = notes.find(x => x.id===id);
+  if (!n) return;
+  document.getElementById('notesEmptyState').style.display = 'none';
+  document.getElementById('notesEditor').style.display = 'flex';
+  document.getElementById('noteTitle').value = n.title || '';
+  document.getElementById('noteBody').value  = n.body  || '';
+  document.getElementById('noteSubjectTag').textContent = n.subject || '';
+  document.getElementById('noteSavedAt').textContent = 'saved ' + (n.savedAt||'');
+  updateWordCount();
+  renderNotesList();
+}
+
+function saveActiveNote() {
+  if (!activeNoteId) return;
+  const n = notes.find(x => x.id===activeNoteId);
+  if (!n) return;
+  n.title = document.getElementById('noteTitle').value || 'Untitled';
+  n.body  = document.getElementById('noteBody').value;
+  n.savedAt = timeStr();
+  S.set('notes', notes);
+  document.getElementById('noteSavedAt').textContent = 'saved ' + n.savedAt;
+  renderNotesList();
+}
+
+function deleteNote(e, id) {
+  e.stopPropagation();
+  notes = notes.filter(x => x.id!==id);
+  S.set('notes', notes);
+  if (activeNoteId===id) {
+    activeNoteId = null;
+    document.getElementById('notesEmptyState').style.display = 'flex';
+    document.getElementById('notesEditor').style.display = 'none';
+  }
+  renderNotesList();
+}
+
+function updateWordCount() {
+  const txt = document.getElementById('noteBody').value;
+  const wc  = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+  document.getElementById('wordCount').textContent = wc + ' words';
+}
+
+function toggleNotePreview() {
+  previewMode = !previewMode;
+  const body = document.getElementById('noteBody');
+  const prev = document.getElementById('notePreview');
+  if (previewMode) {
+    prev.innerHTML = simpleMarkdown(body.value);
+    body.style.display = 'none';
+    prev.style.display = 'block';
+  } else {
+    body.style.display = 'block';
+    prev.style.display = 'none';
+  }
+}
+
+function simpleMarkdown(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^### (.+)$/gm,'<h3 style="color:var(--blue);margin:8px 0 4px;font-size:1rem">$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2 style="color:var(--text);margin:12px 0 6px;font-size:1.1rem">$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1 style="color:var(--text);margin:14px 0 8px;font-size:1.3rem;font-family:\'Lora\',serif">$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code style="background:var(--surface3);padding:1px 5px;border-radius:4px;font-family:\'JetBrains Mono\',monospace;font-size:0.9em">$1</code>')
+    .replace(/^> (.+)$/gm,'<blockquote style="border-left:3px solid var(--blue);padding-left:12px;color:var(--text-dim);margin:8px 0">$1</blockquote>')
+    .replace(/^- (.+)$/gm,'<li style="margin:3px 0;padding-left:6px">$1</li>')
+    .replace(/(<li.*<\/li>\n?)+/g, s => `<ul style="padding-left:16px;margin:8px 0">${s}</ul>`)
+    .replace(/\n/g,'<br>');
+}
+
+function insertMd(before, after) {
+  const ta = document.getElementById('noteBody');
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  const sel = ta.value.substring(s, e);
+  ta.value = ta.value.substring(0,s) + before + sel + after + ta.value.substring(e);
+  ta.focus();
+  ta.selectionStart = s + before.length;
+  ta.selectionEnd   = e + before.length;
+  saveActiveNote();
+}
+
+renderNotesList();
+
+// ===================================================
+// 2. FLASHCARDS
+// ===================================================
+let flashcards = S.get('flashcards') || [];
+let fcDecks = [...new Set(['General', ...flashcards.map(c=>c.deck)])];
+let activeDeck = 'All';
+let fcIndex = 0;
+let fcGot = 0, fcMiss = 0;
+let fcFlipped = false;
+
+function getDeckCards() {
+  return activeDeck === 'All' ? flashcards : flashcards.filter(c=>c.deck===activeDeck);
+}
+
+function addFlashcard() {
+  const q = document.getElementById('fcQuestion').value.trim();
+  const a = document.getElementById('fcAnswer').value.trim();
+  const deckSel = document.getElementById('fcDeckSelect').value;
+  const deckNew = document.getElementById('fcNewDeck').value.trim();
+  const deck = deckNew || deckSel || 'General';
+
+  if (!q || !a) return alert('Please fill in both front and back.');
+
+  if (deckNew && !fcDecks.includes(deckNew)) { fcDecks.push(deckNew); }
+
+  flashcards.push({ id: uid(), q, a, deck });
+  S.set('flashcards', flashcards);
+  document.getElementById('fcQuestion').value = '';
+  document.getElementById('fcAnswer').value   = '';
+  document.getElementById('fcNewDeck').value  = '';
+  renderDecks();
+  renderFcList();
+  fcIndex = 0; fcGot = 0; fcMiss = 0;
+  renderFcStudy();
+}
+
+function renderDecks() {
+  const sel = document.getElementById('fcDeckSelect');
+  const decks = [...new Set(['General', ...flashcards.map(c=>c.deck)])];
+  sel.innerHTML = decks.map(d=>`<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
+
+  const row = document.getElementById('deckRow');
+  row.innerHTML = ['All',...decks].map(d=>`
+    <button class="deck-chip ${d===activeDeck?'active':''}" onclick="selectDeck('${d}')">${escHtml(d)}</button>
+  `).join('');
+}
+
+function selectDeck(d) {
+  activeDeck = d;
+  fcIndex = 0; fcGot = 0; fcMiss = 0; fcFlipped = false;
+  renderDecks();
+  renderFcStudy();
+}
+
+function renderFcStudy() {
+  const cards = getDeckCards();
+  const empty = document.getElementById('fcEmptyState');
+  const study = document.getElementById('fcStudyArea');
+
+  if (!cards.length) {
+    empty.style.display = 'flex';
+    study.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  study.style.display = 'block';
+
+  if (fcIndex >= cards.length) fcIndex = 0;
+  const c = cards[fcIndex];
+
+  document.getElementById('fcFrontText').textContent = c.q;
+  document.getElementById('fcBackText').textContent  = c.a;
+  document.getElementById('fcProgress').textContent  = `${fcIndex+1} / ${cards.length}`;
+  document.getElementById('fcGot').textContent   = fcGot;
+  document.getElementById('fcMiss').textContent  = fcMiss;
+  document.getElementById('fcTotal').textContent = cards.length;
+
+  // Reset flip
+  fcFlipped = false;
+  document.getElementById('fcCardInner').classList.remove('flipped');
+  document.getElementById('fcScoreRow').style.display = 'none';
+}
+
+function flipCard() {
+  fcFlipped = !fcFlipped;
+  document.getElementById('fcCardInner').classList.toggle('flipped', fcFlipped);
+  document.getElementById('fcScoreRow').style.display = fcFlipped ? 'flex' : 'none';
+}
+
+function markCard(got) {
+  if (got) fcGot++; else fcMiss++;
+  nextCard();
+}
+
+function nextCard() {
+  const cards = getDeckCards();
+  fcIndex = (fcIndex + 1) % cards.length;
+  renderFcStudy();
+}
+
+function prevCard() {
+  const cards = getDeckCards();
+  fcIndex = (fcIndex - 1 + cards.length) % cards.length;
+  renderFcStudy();
+}
+
+function shuffleDeck() {
+  for (let i = flashcards.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [flashcards[i],flashcards[j]] = [flashcards[j],flashcards[i]];
+  }
+  S.set('flashcards', flashcards);
+  fcIndex = 0;
+  renderFcList();
+  renderFcStudy();
+}
+
+function renderFcList() {
+  const el = document.getElementById('fcList');
+  if (!flashcards.length) { el.innerHTML = ''; return; }
+  el.innerHTML = flashcards.map(c=>`
+    <div class="fc-list-item">
+      <div class="fc-list-q">${escHtml(c.q)}</div>
+      <div class="fc-list-a">${escHtml(c.a)}</div>
+      <span style="font-size:10px;color:var(--text-faint);margin-right:8px;">${escHtml(c.deck)}</span>
+      <button class="fc-list-del" onclick="deleteCard('${c.id}')">×</button>
+    </div>`).join('');
+}
+
+function deleteCard(id) {
+  flashcards = flashcards.filter(c=>c.id!==id);
+  S.set('flashcards', flashcards);
+  renderDecks(); renderFcList(); renderFcStudy();
+}
+
+// Keyboard nav for flashcards
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('panel-flash').classList.contains('active')) return;
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  if (e.key === 'ArrowRight') nextCard();
+  if (e.key === 'ArrowLeft')  prevCard();
+  if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+renderDecks();
+renderFcList();
+renderFcStudy();
+
+// ===================================================
+// 3. POMODORO TIMER
+// ===================================================
+const MODES = {
+  pomo:   { label: 'FOCUS',       mins: 25, color: '#60a5fa' },
+  short:  { label: 'SHORT BREAK', mins: 5,  color: '#4ade80' },
+  long:   { label: 'LONG BREAK',  mins: 15, color: '#a78bfa' },
+  custom: { label: 'FOCUS',       mins: 45, color: '#fbbf24' },
+};
+let timerMode = 'pomo';
+let totalSecs = 25 * 60;
+let remainSecs = totalSecs;
+let timerRunning = false;
+let timerInterval = null;
+let sessionsToday = 0;
+let timerLog = [];
+
+const CIRCUMFERENCE = 2 * Math.PI * 108; // 678.58
+
+function setTimerMode(mode, btn) {
+  timerMode = mode;
+  document.querySelectorAll('.tmode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('customTimeRow').style.display = mode==='custom' ? 'flex' : 'none';
+  if (mode === 'custom') applyCustomTime();
+  else {
+    totalSecs = MODES[mode].mins * 60;
+    remainSecs = totalSecs;
+  }
+  stopTimer(); updateTimerDisplay();
+}
+
+function applyCustomTime() {
+  const m = parseInt(document.getElementById('customMinutes').value) || 45;
+  totalSecs = m * 60;
+  remainSecs = totalSecs;
+  updateTimerDisplay();
+}
+
+function toggleTimer() {
+  if (timerRunning) pauseTimer(); else startTimerFn();
+}
+
+function startTimerFn() {
+  timerRunning = true;
+  document.getElementById('timerStartBtn').textContent = '⏸ Pause';
+  document.getElementById('timerDisplay').className = 'timer-display running';
+  timerInterval = setInterval(tickTimer, 1000);
+}
+
+function pauseTimer() {
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('timerStartBtn').textContent = '▶ Resume';
+  document.getElementById('timerDisplay').className = 'timer-display paused';
+}
+
+function stopTimer() {
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('timerStartBtn').innerHTML = '▶ Start';
+  document.getElementById('timerDisplay').className = 'timer-display';
+}
+
+function resetTimer() {
+  stopTimer();
+  remainSecs = totalSecs;
+  updateTimerDisplay();
+}
+
+function skipTimer() {
+  completeTimer(false);
+}
+
+function tickTimer() {
+  if (remainSecs <= 0) { completeTimer(true); return; }
+  remainSecs--;
+  updateTimerDisplay();
+}
+
+function completeTimer(auto) {
+  stopTimer();
+  remainSecs = 0;
+  updateTimerDisplay();
+  if (auto && timerMode === 'pomo') {
+    sessionsToday++;
+    const task = document.getElementById('timerTask').value.trim() || 'Focus session';
+    timerLog.unshift({ task, mode: MODES[timerMode].label, mins: MODES[timerMode].mins, time: timeStr() });
+    renderTimerLog();
+    renderSessionDots();
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Session complete!', { body: task + ' — great work 🎉' });
+    }
+  }
+  remainSecs = totalSecs;
+  setTimeout(updateTimerDisplay, 500);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(remainSecs/60).toString().padStart(2,'0');
+  const s = (remainSecs%60).toString().padStart(2,'0');
+  document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+  document.getElementById('timerLabel').textContent = MODES[timerMode]?.label || 'FOCUS';
+  // Ring
+  const frac = totalSecs > 0 ? remainSecs / totalSecs : 0;
+  const offset = CIRCUMFERENCE * (1 - frac);
+  const ring = document.getElementById('timerRing');
+  ring.style.strokeDashoffset = offset;
+  ring.style.stroke = MODES[timerMode]?.color || '#60a5fa';
+  // Title
+  if (timerRunning) document.title = `${m}:${s} — StudyDesk`;
+  else document.title = 'StudyDesk — Your Personal Study Toolkit';
+}
+
+function renderTimerLog() {
+  const el = document.getElementById('timerLog');
+  if (!timerLog.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-faint);text-align:center;padding:20px;">No sessions yet today</div>';
+    return;
+  }
+  el.innerHTML = timerLog.map(l=>`
+    <div class="log-item">
+      <div class="log-item-task">${escHtml(l.task)}</div>
+      <div class="log-item-meta">${l.mode} · ${l.mins} min · ${l.time}</div>
+    </div>`).join('');
+}
+
+function renderSessionDots() {
+  const el = document.getElementById('sessionDots');
+  el.innerHTML = Array.from({length:4},(_,i)=>`
+    <div class="session-dot ${i<(sessionsToday%4)?'done':''}"></div>`).join('');
+}
+
+renderSessionDots();
+updateTimerDisplay();
+
+// Request notification permission
+if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission();
+}
+
+// ===================================================
+// 4. QUIZ BUILDER
+// ===================================================
+let quizQuestions = S.get('quizQuestions') || [];
+let optCount = 4;
+let quizPlayIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+let quizOrder = [];
+
+function buildOptionInputs() {
+  const grid = document.getElementById('quizOptsInput');
+  grid.innerHTML = Array.from({length: optCount}, (_,i) => `
+    <div class="option-row">
+      <input type="radio" class="option-radio" name="correctOpt" value="${i}" ${i===0?'checked':''}>
+      <input type="text" id="qopt${i}" placeholder="Option ${String.fromCharCode(65+i)}…">
+    </div>`).join('');
+}
+
+function addMoreOption() {
+  if (optCount >= 6) return;
+  optCount++;
+  buildOptionInputs();
+}
+
+function addQuizQuestion() {
+  const qText = document.getElementById('quizQText').value.trim();
+  if (!qText) return alert('Please enter a question.');
+
+  const opts = [];
+  for (let i=0;i<optCount;i++) {
+    const v = document.getElementById('qopt'+i)?.value.trim();
+    if (v) opts.push(v);
+  }
+  if (opts.length < 2) return alert('Add at least 2 options.');
+
+  const correct = parseInt(document.querySelector('input[name="correctOpt"]:checked')?.value ?? 0);
+  if (correct >= opts.length) return alert('Please select a valid correct answer.');
+
+  quizQuestions.push({ id: uid(), q: qText, opts, correct });
+  S.set('quizQuestions', quizQuestions);
+  document.getElementById('quizQText').value = '';
+  buildOptionInputs();
+  renderQuizList();
+}
+
+function renderQuizList() {
+  const el = document.getElementById('quizQList');
+  document.getElementById('qCount').textContent = quizQuestions.length;
+  document.getElementById('startQuizBtn').style.display = quizQuestions.length ? 'inline-flex' : 'none';
+
+  if (!quizQuestions.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-faint);text-align:center;padding:20px;">No questions yet</div>';
+    return;
+  }
+  el.innerHTML = quizQuestions.map((q,qi) => `
+    <div class="quiz-q-item">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div class="quiz-q-text"><span style="color:var(--text-faint);font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:8px;">Q${qi+1}</span>${escHtml(q.q)}</div>
+        <button class="fc-list-del" onclick="deleteQuizQ('${q.id}')">×</button>
+      </div>
+      <div class="quiz-opts-list">
+        ${q.opts.map((o,oi)=>`<div class="quiz-opt ${oi===q.correct?'correct':''}">${escHtml(o)}</div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function deleteQuizQ(id) {
+  quizQuestions = quizQuestions.filter(q=>q.id!==id);
+  S.set('quizQuestions', quizQuestions);
+  renderQuizList();
+}
+
+function startQuiz() {
+  if (!quizQuestions.length) return;
+  quizPlayIndex = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  quizOrder = [...quizQuestions].sort(()=>Math.random()-0.5);
+  document.getElementById('quizBuild').style.display = 'none';
+  document.getElementById('quizPlay').style.display  = 'block';
+  document.getElementById('quizResults').style.display = 'none';
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const q = quizOrder[quizPlayIndex];
+  document.getElementById('quizPlayCount').textContent = `Q ${quizPlayIndex+1} / ${quizOrder.length}`;
+  document.getElementById('quizProgressFill').style.width = ((quizPlayIndex/quizOrder.length)*100) + '%';
+  document.getElementById('quizPlayQ').textContent = q.q;
+  document.getElementById('quizFeedback').textContent = '';
+  document.getElementById('quizNextBtn').style.display = 'none';
+  quizAnswered = false;
+
+  const opts = document.getElementById('quizPlayOpts');
+  opts.innerHTML = q.opts.map((o,i)=>`
+    <button class="quiz-opt-btn" onclick="answerQuiz(${i})">${escHtml(o)}</button>`).join('');
+}
+
+function answerQuiz(chosen) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = quizOrder[quizPlayIndex];
+  const btns = document.querySelectorAll('.quiz-opt-btn');
+  btns.forEach(b=>b.disabled=true);
+
+  if (chosen === q.correct) {
+    btns[chosen].classList.add('correct');
+    document.getElementById('quizFeedback').textContent = '✓ Correct!';
+    document.getElementById('quizFeedback').style.color = 'var(--green)';
+    quizScore++;
+  } else {
+    btns[chosen].classList.add('wrong');
+    btns[q.correct].classList.add('correct');
+    document.getElementById('quizFeedback').textContent = `✗ The correct answer was: ${q.opts[q.correct]}`;
+    document.getElementById('quizFeedback').style.color = 'var(--rose)';
+  }
+
+  document.getElementById('quizNextBtn').style.display = 'inline-flex';
+}
+
+function nextQuizQ() {
+  quizPlayIndex++;
+  if (quizPlayIndex >= quizOrder.length) {
+    showQuizResults(); return;
+  }
+  renderQuizQuestion();
+}
+
+function showQuizResults() {
+  document.getElementById('quizProgressFill').style.width = '100%';
+  const pct = Math.round((quizScore/quizOrder.length)*100);
+  document.getElementById('quizScoreNum').textContent = pct + '%';
+  const msgs = [
+    [90, 'Outstanding! 🎉', 'You really know this material.'],
+    [70, 'Great work! 👍', 'A few more reviews and you\'ll ace it.'],
+    [50, 'Keep going! 📚', 'Review the missed questions and try again.'],
+    [0,  'Keep studying! 💪', 'Go back over the material before the next attempt.'],
+  ];
+  const [, title, sub] = msgs.find(([t]) => pct >= t);
+  document.getElementById('quizResultMsg').textContent = title;
+  document.getElementById('quizResultSub').textContent = `${quizScore} / ${quizOrder.length} correct · ${sub}`;
+  document.getElementById('quizResults').style.display = 'block';
+  document.getElementById('quizNextBtn').style.display = 'none';
+  document.getElementById('quizPlayOpts').innerHTML = '';
+  document.getElementById('quizPlayQ').textContent = '';
+  document.getElementById('quizFeedback').textContent = '';
+}
+
+function endQuiz() {
+  document.getElementById('quizBuild').style.display = 'block';
+  document.getElementById('quizPlay').style.display  = 'none';
+}
+
+buildOptionInputs();
+renderQuizList();
+
+// ===================================================
+// UTILS
+// ===================================================
+function uid() { return Math.random().toString(36).slice(2,10); }
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function timeStr() {
+  const now = new Date();
+  return now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+</script>
+
 </body>
 </html>
