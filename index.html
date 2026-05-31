@@ -1,136 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopForge Cart</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-<div class="store">
-  <header class="sh">
-    <span class="sb">🛒 ShopForge</span><input class="ss" placeholder="Search products..." data-cfs-selected="1"><button class="cart-btn" id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
-  </header>
-  <div class="sbody">
-    <main class="pgrid" id="pgrid"><div class="pc"><div class="pi">🎧</div><div class="pinfo"><div class="pn">Headphones</div><div class="pp">$129</div><button class="padd" onclick="addCart(1)">Add to Cart</button></div></div><div class="pc"><div class="pi">⌨️</div><div class="pinfo"><div class="pn">Keyboard</div><div class="pp">$219</div><button class="padd" onclick="addCart(2)">Add to Cart</button></div></div><div class="pc"><div class="pi">🖥️</div><div class="pinfo"><div class="pn">Monitor</div><div class="pp">$449</div><button class="padd" onclick="addCart(3)">Add to Cart</button></div></div><div class="pc"><div class="pi">👟</div><div class="pinfo"><div class="pn">Sneakers</div><div class="pp">$89</div><button class="padd" onclick="addCart(4)">Add to Cart</button></div></div><div class="pc"><div class="pi">⌚</div><div class="pinfo"><div class="pn">Watch</div><div class="pp">$299</div><button class="padd" onclick="addCart(5)">Add to Cart</button></div></div><div class="pc"><div class="pi">🧥</div><div class="pinfo"><div class="pn">Jacket</div><div class="pp">$179</div><button class="padd" onclick="addCart(6)">Add to Cart</button></div></div></main>
-    <aside class="cart-side" id="cartSide">
-      <div class="csh">
-        <h3>Your Cart</h3>
-        <button onclick="document.getElementById('cartSide').style.transform='translateX(100%)'">✕</button>
-      </div>
-      <div class="citems" id="citems">
-        <p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>
-      </div>
-      <div class="cfoot">
-        <div class="ctrow"><span>Total</span><strong id="ctotal">$0.00</strong></div>
-        <button class="cbtn">Checkout →</button>
-      </div>
-    </aside>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .store {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .sh {
+      height: 56px;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .sb {
+      font-weight: 800;
+      font-size: 1.05rem;
+      white-space: nowrap;
+    }
+
+    .ss {
+      flex: 1;
+      padding: 7px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .cart-btn {
+      padding: 7px 16px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sbody {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .pgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      align-content: start;
+    }
+
+    .pc {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .pc:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .pi {
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      background: #f1f5f9;
+    }
+
+    .pinfo {
+      padding: 12px;
+    }
+
+    .pn {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .pp {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #6366f1;
+      margin-bottom: 8px;
+    }
+
+    .padd {
+      width: 100%;
+      padding: 7px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cart-side {
+      width: 280px;
+      background: #fff;
+      border-left: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      transform: translateX(100%);
+      transition: transform 0.3s;
+      z-index: 10;
+    }
+
+    .cart-side.open {
+      transform: none;
+    }
+
+    .csh {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .citems {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 18px;
+    }
+
+    .ci {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.82rem;
+    }
+
+    .cfoot {
+      padding: 14px 18px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .ctrow {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
+    .cbtn {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Additional Specific Selectors */
+    div:nth-of-type(2) > div:nth-of-type(1) {
+      color: #1a44b7;
+      background-color: #7cb18f;
+    }
+
+    div > main {
+      background-color: #404f72;
+    }
+
+    div:nth-of-type(1) > div:nth-of-type(1) {
+      background-color: #7fc781;
+    }
+
+    header > input {
+      font-size: 16.6px;
+      font-weight: 400;
+      text-align: center;
+      padding: 7px 12px;
+      margin: 0px;
+      border-radius: 7px;
+      width: 272.913px;
+      height: 31.6px;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="store">
+    <header class="sh">
+      <span class="sb">🛒 ShopForge</span>
+      <input class="ss" placeholder="Search products...">
+      <button class="cart-btn" id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
+    </header>
+    <div class="sbody">
+      <main class="pgrid" id="pgrid"></main>
+      
+      <aside class="cart-side" id="cartSide">
+        <div class="csh">
+          <h3>Your Cart</h3>
+          <button onclick="document.getElementById('cartSide').classList.remove('open')">✕</button>
+        </div>
+        <div class="citems" id="citems">
+          <p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>
+        </div>
+        <div class="cfoot">
+          <div class="ctrow"><span>Total</span><strong id="ctotal">$0.00</strong></div>
+          <button class="cbtn">Checkout →</button>
+        </div>
+      </aside>
+    </div>
   </div>
-</div>
-<div class="store">
-  <header class="sh">
-    <span class="sb">🛒 ShopForge</span><input class="ss" placeholder="Search products..."><button class="cart-btn" id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
-  </header>
-  <div class="sbody">
-    <main class="pgrid" id="pgrid"></main>
-    <aside class="cart-side" id="cartSide">
-      <div class="csh">
-        <h3>Your Cart</h3>
-        <button onclick="document.getElementById('cartSide').style.transform='translateX(100%)'">✕</button>
-      </div>
-      <div class="citems" id="citems">
-        <p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>
-      </div>
-      <div class="cfoot">
-        <div class="ctrow"><span>Total</span><strong id="ctotal">$0.00</strong></div>
-        <button class="cbtn">Checkout →</button>
-      </div>
-    </aside>
-  </div>
-</div>
-<script>
-  (function(){
-  var _l=console.log,_w=console.warn,_e=console.error;
-  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
-  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
-  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
-  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
-  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
-})();
-</script>
-<script>
-  try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
-let cart=[];
-const grid=document.getElementById("pgrid");
-grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
-window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
-function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
-document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}
-</script>
-<script>
-  (function(){
-  var _l=console.log,_w=console.warn,_e=console.error;
-  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
-  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
-  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
-  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
-  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
-})();
-</script>
-<script>
-  try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
-let cart=[];
-const grid=document.getElementById("pgrid");
-grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
-window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
-function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
-document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}
-</script>
-<script>
-  (function(){
-  var _l=console.log,_w=console.warn,_e=console.error;
-  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
-  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
-  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
-  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
-  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
-})();
-</script>
-<script>
-  try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
-let cart=[];
-const grid=document.getElementById("pgrid");
-grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
-window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
-function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
-document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}
-</script>
-<script>
-  (function(){
-  var _l=console.log,_w=console.warn,_e=console.error;
-  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
-  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
-  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
-  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
-  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
-})();
-</script>
-<script>
-  try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
-let cart=[];
-const grid=document.getElementById("pgrid");
-grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
-window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
-function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
-document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}
-</script>
-<script>
-(function(){
-  var _l=console.log,_w=console.warn,_e=console.error;
-  function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
-  console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
-  console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
-  console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
-  window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
-})();
-</script>
-<script>try{const prods=[{id:1,n:"Headphones",p:129,e:"🎧"},{id:2,n:"Keyboard",p:219,e:"⌨️"},{id:3,n:"Monitor",p:449,e:"🖥️"},{id:4,n:"Sneakers",p:89,e:"👟"},{id:5,n:"Watch",p:299,e:"⌚"},{id:6,n:"Jacket",p:179,e:"🧥"}];
-let cart=[];
-const grid=document.getElementById("pgrid");
-grid.innerHTML=prods.map(p=>`<div class="pc"><div class="pi">${p.e}</div><div class="pinfo"><div class="pn">${p.n}</div><div class="pp">$${p.p}</div><button class="padd" onclick="addCart(${p.id})">Add to Cart</button></div></div>`).join("");
-window.addCart=function(id){const p=prods.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...p,q:1});renderCart();document.getElementById("cartSide").classList.add("open");};
-function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.q,0);const ci=document.getElementById("citems");if(!cart.length){ci.innerHTML='<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';document.getElementById("ctotal").textContent="$0.00";return;}ci.innerHTML=cart.map(i=>`<div class="ci"><span>${i.e} ${i.n} ×${i.q}</span><span style="font-weight:700;color:#6366f1;">$${i.p*i.q}</span></div>`).join("");document.getElementById("ctotal").textContent="$"+cart.reduce((s,x)=>s+x.p*x.q,0).toFixed(2);}
-document.getElementById("cartBtn").onclick=()=>document.getElementById("cartSide").classList.toggle("open");}catch(err){console.error(err.message);}</script>
+
+  <script>
+    try {
+      const prods = [
+        {id: 1, n: "Headphones", p: 129, e: "🎧"},
+        {id: 2, n: "Keyboard", p: 219, e: "⌨️"},
+        {id: 3, n: "Monitor", p: 449, e: "🖥️"},
+        {id: 4, n: "Sneakers", p: 89, e: "👟"},
+        {id: 5, n: "Watch", p: 299, e: "⌚"},
+        {id: 6, n: "Jacket", p: 179, e: "🧥"}
+      ];
+      
+      let cart = [];
+      const grid = document.getElementById("pgrid");
+      
+      grid.innerHTML = prods.map(p => `
+        <div class="pc">
+          <div class="pi">${p.e}</div>
+          <div class="pinfo">
+            <div class="pn">${p.n}</div>
+            <div class="pp">$${p.p}</div>
+            <button class="padd" onclick="addCart(${p.id})">Add to Cart</button>
+          </div>
+        </div>
+      `).join("");
+      
+      window.addCart = function(id) {
+        const p = prods.find(x => x.id === id);
+        const ex = cart.find(x => x.id === id);
+        ex ? ex.q++ : cart.push({...p, q: 1});
+        renderCart();
+        document.getElementById("cartSide").classList.add("open");
+      };
+      
+      function renderCart() {
+        document.getElementById("cartCount").textContent = cart.reduce((s, x) => s + x.q, 0);
+        const ci = document.getElementById("citems");
+        if (!cart.length) {
+          ci.innerHTML = '<p style="color:#94a3b8;text-align:center;padding:20px;">Cart is empty</p>';
+          document.getElementById("ctotal").textContent = "$0.00";
+          return;
+        }
+        ci.innerHTML = cart.map(i => `
+          <div class="ci">
+            <span>${i.e} ${i.n} ×${i.q}</span>
+            <span style="font-weight:700;color:#6366f1;">$${i.p * i.q}</span>
+          </div>
+        `).join("");
+        document.getElementById("ctotal").textContent = "$" + cart.reduce((s, x) => s + x.p * x.q, 0).toFixed(2);
+      }
+      
+      document.getElementById("cartBtn").onclick = () => document.getElementById("cartSide").classList.toggle("open");
+      
+    } catch(err) {
+      console.error(err.message);
+    }
+  </script>
+</body>
+</html>
