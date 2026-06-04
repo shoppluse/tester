@@ -4,18 +4,270 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber Security Command Center</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --bg-color: #0d0e12;
+            --panel-bg: #141721;
+            --primary-color: #39ff14; 
+            --text-color: #e0e0e0;
+            --text-muted: #a0a2ba;
+            --focus-color: #ff00ff; /* Magenta for highly visible focus */
+            --base-font-size: 16px;
+            --transition-speed: 0.3s;
+        }
+
+        /* User Preference Overrides applied via JS */
+        body.large-text {
+            --base-font-size: 20px;
+        }
+
+        body.max-contrast {
+            --bg-color: #000000;
+            --panel-bg: #000000;
+            --primary-color: #ffffff;
+            --text-color: #ffffff;
+            --text-muted: #ffffff;
+            --focus-color: #ffff00; /* Yellow focus in high contrast */
+        }
+
+        body.reduce-motion * {
+            --transition-speed: 0s !important;
+            transition: none !important;
+            animation: none !important;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: var(--base-font-size);
+            padding: 2rem;
+            line-height: 1.6;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* Accessibility Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 20px;
+            background: var(--focus-color);
+            color: #000;
+            padding: 10px 15px;
+            font-weight: bold;
+            z-index: 9999;
+            text-decoration: none;
+        }
+        .skip-link:focus {
+            top: 20px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* Highly Visible Focus States */
+        *:focus-visible {
+            outline: 3px solid var(--focus-color);
+            outline-offset: 3px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-good {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding-bottom: 1rem;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 2px;
+        }
+
+        .nav-btn[aria-current="page"] {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            font-weight: bold;
+            border-color: var(--primary-color);
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+        }
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 800px) {
+            .dashboard-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--text-muted);
+            padding: 1.5rem;
+        }
+
+        .terminal-panel {
+            display: flex;
+            flex-direction: column;
+            height: 50vh;
+            min-height: 400px;
+        }
+
+        .terminal-output {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .terminal-input-area {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-top: 1px dashed var(--text-muted);
+            padding-top: 1rem;
+        }
+
+        .prompt-label {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        #terminal-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0.2rem;
+        }
+
+        .metrics-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        .metrics-list li {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar-container {
+            background-color: var(--bg-color);
+            border: 1px solid var(--text-muted);
+            height: 1.2rem;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width var(--transition-speed) ease;
+        }
+
+        /* Modal / Dialog Styling */
+        dialog {
+            margin: auto;
+            padding: 2rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .settings-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .toggle-label input[type="checkbox"] {
+            width: 1.5rem;
+            height: 1.5rem;
+            accent-color: var(--primary-color);
+        }
+    </style>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <header class="system-header">
-        <h1>SYS_STATUS: <span class="status-good">ONLINE</span></h1>
-        <nav aria-label="System Navigation">
-            <ul>
+        <div class="header-content">
+            <h1>SYS_STATUS: <span class="status-good" aria-label="System is Online">ONLINE</span></h1>
+            <button type="button" id="a11y-btn" class="action-btn" aria-haspopup="dialog">
+                Accessibility Settings
+            </button>
+        </div>
+        <nav aria-label="Main Navigation">
+            <ul class="nav-list">
                 <li><button type="button" class="nav-btn" aria-current="page">Terminal</button></li>
-                <li><button type="button" class="nav-btn">Logs</button></li>
-                <li><button type="button" class="nav-btn">Network</button></li>
+                <li><button type="button" class="nav-btn">Event Logs</button></li>
+                <li><button type="button" class="nav-btn">Network Map</button></li>
             </ul>
         </nav>
     </header>
@@ -23,43 +275,152 @@
     <main id="main-content">
         <div class="dashboard-grid">
             <section class="panel terminal-panel" aria-labelledby="terminal-heading">
-                <h2 id="terminal-heading" class="sr-only">System Terminal</h2>
+                <h2 id="terminal-heading" class="sr-only">Command Line Interface</h2>
                 
-                <div id="terminal-output" class="terminal-output" aria-live="polite">
-                    <p class="system-msg">[SYSTEM INITIALIZED] Welcome to Core-OS v4.11.</p>
-                    <p class="system-msg">Type 'help' to view available diagnostic commands.</p>
+                <div id="terminal-output" class="terminal-output" aria-live="polite" aria-atomic="false" role="log">
+                    <p class="system-msg">[SYSTEM INITIALIZED] Core-OS v4.11.</p>
+                    <p class="system-msg">Enter 'help' to view available diagnostic commands.</p>
                 </div>
 
                 <form id="terminal-form" class="terminal-input-area">
-                    <label for="terminal-input" class="prompt-label"><span aria-hidden="true">guest@node:~#</span><span class="sr-only">Enter command:</span></label>
-                    <input type="text" id="terminal-input" autocomplete="off" autofocus required>
-                    <button type="submit" class="sr-only">Execute Command</button>
+                    <label for="terminal-input" class="prompt-label" id="prompt-text">
+                        <span aria-hidden="true">admin@root:~#</span>
+                        <span class="sr-only">Enter system command:</span>
+                    </label>
+                    <input type="text" id="terminal-input" aria-describedby="cmd-hint" autocomplete="off" autofocus required>
+                    <button type="submit" class="sr-only">Execute</button>
                 </form>
+                <div id="cmd-hint" class="sr-only">Press Enter to submit command. Type 'clear' to empty logs.</div>
             </section>
 
             <section class="panel metrics-panel" aria-labelledby="metrics-heading">
-                <h2 id="metrics-heading">System Diagnostics</h2>
+                <h2 id="metrics-heading">Live Diagnostics</h2>
                 <ul class="metrics-list">
                     <li>
-                        <span class="metric-label">CPU Load:</span>
+                        <span class="metric-label" id="cpu-label">CPU Load:</span>
                         <div class="progress-bar-container">
-                            <div class="progress-bar" role="progressbar" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100" style="width: 42%;"></div>
+                            <div class="progress-bar" role="progressbar" aria-labelledby="cpu-label" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100" style="width: 42%;"></div>
                         </div>
-                        <span class="metric-value">42%</span>
+                        <span class="metric-value" aria-hidden="true">42%</span>
                     </li>
                     <li>
-                        <span class="metric-label">Firewall Integrity:</span>
-                        <span class="metric-value status-good">SECURE</span>
-                    </li>
-                    <li>
-                        <span class="metric-label">Node Latency:</span>
-                        <span class="metric-value">14ms</span>
+                        <span class="metric-label">Encryption Protocol:</span>
+                        <span class="metric-value status-good">AES-256 ACTIVE</span>
                     </li>
                 </ul>
             </section>
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <dialog id="a11y-modal" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <h2 id="modal-title">Accessibility Preferences</h2>
+            <p class="modal-desc">Adjust the interface to suit your needs. Preferences are saved automatically.</p>
+            
+            <div class="settings-group">
+                <label class="toggle-label">
+                    <input type="checkbox" id="toggle-large-text">
+                    Enable Large Text
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="toggle-max-contrast">
+                    Maximum Contrast Mode (Black & White)
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="toggle-reduce-motion">
+                    Reduce Animations
+                </label>
+            </div>
+
+            <button type="button" id="close-modal-btn" class="action-btn">Close Settings</button>
+        </div>
+    </dialog>
+
+    <script>
+        /* --- JAVASCRIPT LOGIC --- */
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('terminal-form');
+            const input = document.getElementById('terminal-input');
+            const output = document.getElementById('terminal-output');
+
+            const commands = {
+                help: "Commands: [help] - show this menu | [scan] - run diagnostics | [clear] - empty terminal",
+                scan: "Initializing trace... 0 unauthorized packets found. Connection encrypted.",
+                clear: "clear"
+            };
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const rawCmd = input.value.trim();
+                const cmd = rawCmd.toLowerCase();
+                
+                if (!rawCmd) return;
+
+                appendLog(`admin@root:~# ${rawCmd}`);
+
+                if (cmd === 'clear') {
+                    output.innerHTML = '';
+                } else if (commands[cmd]) {
+                    appendLog(commands[cmd]);
+                } else {
+                    appendLog(`Command not recognized: '${rawCmd}'. Type 'help' for options.`);
+                }
+
+                input.value = '';
+                output.scrollTop = output.scrollHeight; 
+            });
+
+            function appendLog(text) {
+                const p = document.createElement('p');
+                p.textContent = text;
+                output.appendChild(p);
+            }
+
+            const a11yBtn = document.getElementById('a11y-btn');
+            const a11yModal = document.getElementById('a11y-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            
+            const toggleLargeText = document.getElementById('toggle-large-text');
+            const toggleMaxContrast = document.getElementById('toggle-max-contrast');
+            const toggleReduceMotion = document.getElementById('toggle-reduce-motion');
+
+            a11yBtn.addEventListener('click', () => {
+                a11yModal.showModal();
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                a11yModal.close();
+            });
+
+            function applyPreferences() {
+                document.body.classList.toggle('large-text', toggleLargeText.checked);
+                document.body.classList.toggle('max-contrast', toggleMaxContrast.checked);
+                document.body.classList.toggle('reduce-motion', toggleReduceMotion.checked);
+                
+                localStorage.setItem('a11y-large-text', toggleLargeText.checked);
+                localStorage.setItem('a11y-max-contrast', toggleMaxContrast.checked);
+                localStorage.setItem('a11y-reduce-motion', toggleReduceMotion.checked);
+            }
+
+            function loadPreferences() {
+                toggleLargeText.checked = localStorage.getItem('a11y-large-text') === 'true';
+                toggleMaxContrast.checked = localStorage.getItem('a11y-max-contrast') === 'true';
+                toggleReduceMotion.checked = localStorage.getItem('a11y-reduce-motion') === 'true';
+                
+                if (localStorage.getItem('a11y-reduce-motion') === null) {
+                    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    toggleReduceMotion.checked = prefersReduced;
+                }
+
+                applyPreferences();
+            }
+
+            [toggleLargeText, toggleMaxContrast, toggleReduceMotion].forEach(toggle => {
+                toggle.addEventListener('change', applyPreferences);
+            });
+
+            loadPreferences();
+        });
+    </script>
 </body>
 </html>
