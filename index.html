@@ -1,426 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+    (function(){
+      var _l=console.log,_w=console.warn,_e=console.error;
+      function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
+      console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
+      console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
+      console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
+      window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
+    })();
+  </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Security Command Center</title>
+    <title>Link Detail Extractor</title>
     <style>
-        /* --- CSS STYLES --- */
-        :root {
-            --bg-color: #0d0e12;
-            --panel-bg: #141721;
-            --primary-color: #39ff14; 
-            --text-color: #e0e0e0;
-            --text-muted: #a0a2ba;
-            --focus-color: #ff00ff; /* Magenta for highly visible focus */
-            --base-font-size: 16px;
-            --transition-speed: 0.3s;
-        }
-
-        /* User Preference Overrides applied via JS */
-        body.large-text {
-            --base-font-size: 20px;
-        }
-
-        body.max-contrast {
-            --bg-color: #000000;
-            --panel-bg: #000000;
-            --primary-color: #ffffff;
-            --text-color: #ffffff;
-            --text-muted: #ffffff;
-            --focus-color: #ffff00; /* Yellow focus in high contrast */
-        }
-
-        body.reduce-motion * {
-            --transition-speed: 0s !important;
-            transition: none !important;
-            animation: none !important;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* CSS Styling */
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: var(--base-font-size);
-            padding: 2rem;
-            line-height: 1.6;
-            transition: background-color var(--transition-speed), color var(--transition-speed);
-        }
-
-        /* Accessibility Skip Link */
-        .skip-link {
-            position: absolute;
-            top: -100px;
-            left: 20px;
-            background: var(--focus-color);
-            color: #000;
-            padding: 10px 15px;
-            font-weight: bold;
-            z-index: 9999;
-            text-decoration: none;
-        }
-        .skip-link:focus {
-            top: 20px;
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            border: 0;
-        }
-
-        /* Highly Visible Focus States */
-        *:focus-visible {
-            outline: 3px solid var(--focus-color);
-            outline-offset: 3px;
-        }
-
-        .header-content {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: grey;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
+            padding: 50px 20px;
+            margin: 0;
         }
 
-        .status-good {
-            color: var(--primary-color);
-            font-weight: bold;
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
         }
 
-        .nav-list {
-            list-style: none;
+        h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
             display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            padding-bottom: 1rem;
+            gap: 10px;
+        }
+
+        input[type="url"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="url"]:focus {
+            border-color: #007bff;
         }
 
         button {
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 1rem;
-        }
-
-        .nav-btn {
-            background: transparent;
-            border: 1px solid var(--text-muted);
-            color: var(--text-color);
-            padding: 0.5rem 1rem;
-            border-radius: 2px;
-        }
-
-        .nav-btn[aria-current="page"] {
-            background: var(--primary-color);
-            color: var(--bg-color);
-            font-weight: bold;
-            border-color: var(--primary-color);
-        }
-
-        .action-btn {
-            background: transparent;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 0.5rem 1rem;
-            font-weight: bold;
-        }
-        .action-btn:hover {
-            background: var(--primary-color);
-            color: var(--bg-color);
-        }
-
-        .dashboard-grid {
-            display: grid;
-            gap: 1.5rem;
-            grid-template-columns: 1fr;
-        }
-        @media (min-width: 800px) {
-            .dashboard-grid {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
-
-        .panel {
-            background-color: var(--panel-bg);
-            border: 1px solid var(--text-muted);
-            padding: 1.5rem;
-        }
-
-        .terminal-panel {
-            display: flex;
-            flex-direction: column;
-            height: 50vh;
-            min-height: 400px;
-        }
-
-        .terminal-output {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-bottom: 1rem;
-        }
-
-        .terminal-input-area {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border-top: 1px dashed var(--text-muted);
-            padding-top: 1rem;
-        }
-
-        .prompt-label {
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        #terminal-input {
-            flex-grow: 1;
-            background: transparent;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
             border: none;
-            color: var(--text-color);
-            font-family: inherit;
-            font-size: inherit;
-            padding: 0.2rem;
-        }
-
-        .metrics-list {
-            list-style: none;
-            margin-top: 1rem;
-        }
-        .metrics-list li {
-            margin-bottom: 1.5rem;
-        }
-
-        .progress-bar-container {
-            background-color: var(--bg-color);
-            border: 1px solid var(--text-muted);
-            height: 1.2rem;
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: var(--primary-color);
-            transition: width var(--transition-speed) ease;
-        }
-
-        /* Modal / Dialog Styling */
-        dialog {
-            margin: auto;
-            padding: 2rem;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 2px solid var(--primary-color);
-            max-width: 500px;
-            width: 90%;
-        }
-
-        dialog::backdrop {
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        .settings-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.1rem;
+            border-radius: 6px;
+            font-size: 16px;
             cursor: pointer;
+            transition: background 0.3s;
         }
 
-        .toggle-label input[type="checkbox"] {
-            width: 1.5rem;
-            height: 1.5rem;
-            accent-color: var(--primary-color);
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .loader {
+            display: none;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        /* Result Card Styling */
+        .result-card {
+            display: none;
+            margin-top: 25px;
+            text-align: left;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: #fff;
+            transition: transform 0.2s;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .result-img {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+            background: #fdfdfd;
+            border-bottom: 1px solid #eaeaea;
+            display: none; 
+        }
+
+        .result-content {
+            padding: 20px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: #222;
+        }
+
+        .result-desc {
+            font-size: 14px;
+            color: #555;
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .result-link {
+            display: inline-block;
+            padding: 10px 18px;
+            background-color: #ff9900; /* Styled like a standard buy/action button */
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .result-link:hover {
+            background-color: #e68a00;
+        }
+
+        .error {
+            color: #dc3545;
+            margin-top: 15px;
+            display: none;
+            font-size: 14px;
         }
     </style>
+
+  
 </head>
 <body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <header class="system-header">
-        <div class="header-content">
-            <h1>SYS_STATUS: <span class="status-good" aria-label="System is Online">ONLINE</span></h1>
-            <button type="button" id="a11y-btn" class="action-btn" aria-haspopup="dialog">
-                Accessibility Settings
-            </button>
+    <div class="container">
+        <h2>Link Extractor</h2>
+        <div class="input-group">
+            <input type="url" id="urlInput" placeholder="Paste a URL here (e.g., https://example.com)" required="">
+            <button onclick="extractDetails()">Extract</button>
         </div>
-        <nav aria-label="Main Navigation">
-            <ul class="nav-list">
-                <li><button type="button" class="nav-btn" aria-current="page">Terminal</button></li>
-                <li><button type="button" class="nav-btn">Event Logs</button></li>
-                <li><button type="button" class="nav-btn">Network Map</button></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main id="main-content">
-        <div class="dashboard-grid">
-            <section class="panel terminal-panel" aria-labelledby="terminal-heading">
-                <h2 id="terminal-heading" class="sr-only">Command Line Interface</h2>
-                
-                <div id="terminal-output" class="terminal-output" aria-live="polite" aria-atomic="false" role="log">
-                    <p class="system-msg">[SYSTEM INITIALIZED] Core-OS v4.11.</p>
-                    <p class="system-msg">Enter 'help' to view available diagnostic commands.</p>
-                </div>
+        <div class="loader" id="loader"></div>
+        <div class="error" id="errorMsg"></div>
 
-                <form id="terminal-form" class="terminal-input-area">
-                    <label for="terminal-input" class="prompt-label" id="prompt-text">
-                        <span aria-hidden="true">admin@root:~#</span>
-                        <span class="sr-only">Enter system command:</span>
-                    </label>
-                    <input type="text" id="terminal-input" aria-describedby="cmd-hint" autocomplete="off" autofocus required>
-                    <button type="submit" class="sr-only">Execute</button>
-                </form>
-                <div id="cmd-hint" class="sr-only">Press Enter to submit command. Type 'clear' to empty logs.</div>
-            </section>
-
-            <section class="panel metrics-panel" aria-labelledby="metrics-heading">
-                <h2 id="metrics-heading">Live Diagnostics</h2>
-                <ul class="metrics-list">
-                    <li>
-                        <span class="metric-label" id="cpu-label">CPU Load:</span>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" role="progressbar" aria-labelledby="cpu-label" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100" style="width: 42%;"></div>
-                        </div>
-                        <span class="metric-value" aria-hidden="true">42%</span>
-                    </li>
-                    <li>
-                        <span class="metric-label">Encryption Protocol:</span>
-                        <span class="metric-value status-good">AES-256 ACTIVE</span>
-                    </li>
-                </ul>
-            </section>
-        </div>
-    </main>
-
-    <dialog id="a11y-modal" aria-labelledby="modal-title">
-        <div class="modal-content">
-            <h2 id="modal-title">Accessibility Preferences</h2>
-            <p class="modal-desc">Adjust the interface to suit your needs. Preferences are saved automatically.</p>
-            
-            <div class="settings-group">
-                <label class="toggle-label">
-                    <input type="checkbox" id="toggle-large-text">
-                    Enable Large Text
-                </label>
-                <label class="toggle-label">
-                    <input type="checkbox" id="toggle-max-contrast">
-                    Maximum Contrast Mode (Black & White)
-                </label>
-                <label class="toggle-label">
-                    <input type="checkbox" id="toggle-reduce-motion">
-                    Reduce Animations
-                </label>
+        <div class="result-card" id="resultCard">
+            <img src="" alt="Preview Image" class="result-img" id="resultImg">
+            <div class="result-content">
+                <h3 class="result-title" id="resultTitle">Title goes here</h3>
+                <p class="result-desc" id="resultDesc">Description goes here...</p>
+                <a href="#" target="_blank" class="result-link" id="resultLink">Visit Link</a>
             </div>
-
-            <button type="button" id="close-modal-btn" class="action-btn">Close Settings</button>
         </div>
-    </dialog>
+    </div>
 
     <script>
-        /* --- JAVASCRIPT LOGIC --- */
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('terminal-form');
-            const input = document.getElementById('terminal-input');
-            const output = document.getElementById('terminal-output');
-
-            const commands = {
-                help: "Commands: [help] - show this menu | [scan] - run diagnostics | [clear] - empty terminal",
-                scan: "Initializing trace... 0 unauthorized packets found. Connection encrypted.",
-                clear: "clear"
-            };
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const rawCmd = input.value.trim();
-                const cmd = rawCmd.toLowerCase();
-                
-                if (!rawCmd) return;
-
-                appendLog(`admin@root:~# ${rawCmd}`);
-
-                if (cmd === 'clear') {
-                    output.innerHTML = '';
-                } else if (commands[cmd]) {
-                    appendLog(commands[cmd]);
-                } else {
-                    appendLog(`Command not recognized: '${rawCmd}'. Type 'help' for options.`);
-                }
-
-                input.value = '';
-                output.scrollTop = output.scrollHeight; 
-            });
-
-            function appendLog(text) {
-                const p = document.createElement('p');
-                p.textContent = text;
-                output.appendChild(p);
-            }
-
-            const a11yBtn = document.getElementById('a11y-btn');
-            const a11yModal = document.getElementById('a11y-modal');
-            const closeModalBtn = document.getElementById('close-modal-btn');
+        // JavaScript Logic
+        async function extractDetails() {
+            const urlInput = document.getElementById('urlInput').value;
+            const loader = document.getElementById('loader');
+            const resultCard = document.getElementById('resultCard');
+            const errorMsg = document.getElementById('errorMsg');
             
-            const toggleLargeText = document.getElementById('toggle-large-text');
-            const toggleMaxContrast = document.getElementById('toggle-max-contrast');
-            const toggleReduceMotion = document.getElementById('toggle-reduce-motion');
+            // UI Reset
+            loader.style.display = 'block';
+            resultCard.style.display = 'none';
+            errorMsg.style.display = 'none';
 
-            a11yBtn.addEventListener('click', () => {
-                a11yModal.showModal();
-            });
-
-            closeModalBtn.addEventListener('click', () => {
-                a11yModal.close();
-            });
-
-            function applyPreferences() {
-                document.body.classList.toggle('large-text', toggleLargeText.checked);
-                document.body.classList.toggle('max-contrast', toggleMaxContrast.checked);
-                document.body.classList.toggle('reduce-motion', toggleReduceMotion.checked);
-                
-                localStorage.setItem('a11y-large-text', toggleLargeText.checked);
-                localStorage.setItem('a11y-max-contrast', toggleMaxContrast.checked);
-                localStorage.setItem('a11y-reduce-motion', toggleReduceMotion.checked);
+            if (!urlInput) {
+                showError('Please enter a valid URL.');
+                return;
             }
 
-            function loadPreferences() {
-                toggleLargeText.checked = localStorage.getItem('a11y-large-text') === 'true';
-                toggleMaxContrast.checked = localStorage.getItem('a11y-max-contrast') === 'true';
-                toggleReduceMotion.checked = localStorage.getItem('a11y-reduce-motion') === 'true';
+            try {
+                // Using a public CORS proxy to fetch the HTML content
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlInput)}`;
+                const response = await fetch(proxyUrl);
                 
-                if (localStorage.getItem('a11y-reduce-motion') === null) {
-                    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                    toggleReduceMotion.checked = prefersReduced;
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                const htmlContent = data.contents;
+
+                // Parse the fetched HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+
+                // Extract Metadata (Prioritizing OpenGraph tags)
+                const title = doc.querySelector('meta[property="og:title"]')?.content || 
+                              doc.querySelector('title')?.innerText || 
+                              'No Title Found';
+                              
+                const description = doc.querySelector('meta[property="og:description"]')?.content || 
+                                    doc.querySelector('meta[name="description"]')?.content || 
+                                    'No description available for this page.';
+                                    
+                const image = doc.querySelector('meta[property="og:image"]')?.content || '';
+
+                // Populate the UI
+                document.getElementById('resultTitle').innerText = title;
+                document.getElementById('resultDesc').innerText = description;
+                document.getElementById('resultLink').href = urlInput;
+
+                const imgElement = document.getElementById('resultImg');
+                if (image) {
+                    imgElement.src = image;
+                    imgElement.style.display = 'block';
+                } else {
+                    imgElement.style.display = 'none';
                 }
 
-                applyPreferences();
+                // Hide loader, show result
+                loader.style.display = 'none';
+                resultCard.style.display = 'block';
+
+            } catch (error) {
+                console.error("Extraction error:", error);
+                showError('Failed to extract details. The website might be blocking automated requests.');
             }
+        }
 
-            [toggleLargeText, toggleMaxContrast, toggleReduceMotion].forEach(toggle => {
-                toggle.addEventListener('change', applyPreferences);
-            });
-
-            loadPreferences();
-        });
+        function showError(message) {
+            const loader = document.getElementById('loader');
+            const errorMsg = document.getElementById('errorMsg');
+            loader.style.display = 'none';
+            errorMsg.innerText = message;
+            errorMsg.style.display = 'block';
+        }
     </script>
+
+  
+
 </body>
 </html>
