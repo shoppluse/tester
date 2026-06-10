@@ -1,269 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-    (function(){
-      var _l=console.log,_w=console.warn,_e=console.error;
-      function _s(t,a){window.parent.postMessage({type:'log',lt:t,msg:a.map(x=>x===null?'null':x===undefined?'undefined':typeof x==='object'?JSON.stringify(x):String(x)).join(' ')},'*');}
-      console.log=function(){_l.apply(this,arguments);_s('log',[].slice.call(arguments));};
-      console.warn=function(){_w.apply(this,arguments);_s('warn',[].slice.call(arguments));};
-      console.error=function(){_e.apply(this,arguments);_s('error',[].slice.call(arguments));};
-      window.onerror=function(m,u,l){_s('error',[m+' (line '+l+')']);};
-    })();
-  </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Detail Extractor</title>
+    <title>CYBERPULSE // Aesthetic Arcade</title>
     <style>
-        /* CSS Styling */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: grey;
+        :root {
+            --bg-color: #080810;
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --neon-yellow: #ffec00;
+            --glass-bg: rgba(13, 13, 25, 0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 600px;
+            max-height: 900px;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #14142b 0%, #080810 100%);
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 50px 20px;
-            margin: 0;
+            z-index: 10;
+            transition: all 0.5s ease;
         }
 
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
+        .screen {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 16px;
             text-align: center;
+            max-width: 85%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        h2 {
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 20px;
+        h1 {
+            color: #fff;
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-magenta);
         }
 
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        input[type="url"] {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        input[type="url"]:focus {
-            border-color: #007bff;
-        }
-
-        button {
-            padding: 12px 24px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .loader {
-            display: none;
-            margin: 20px auto;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007bff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-
-        /* Result Card Styling */
-        .result-card {
-            display: none;
-            margin-top: 25px;
-            text-align: left;
-            border: 1px solid #eaeaea;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            background: #fff;
-            transition: transform 0.2s;
-        }
-
-        .result-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .result-img {
-            width: 100%;
-            height: 250px;
-            object-fit: contain;
-            background: #fdfdfd;
-            border-bottom: 1px solid #eaeaea;
-            display: none; 
-        }
-
-        .result-content {
-            padding: 20px;
-        }
-
-        .result-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0 0 10px 0;
-            color: #222;
-        }
-
-        .result-desc {
-            font-size: 14px;
-            color: #555;
-            margin: 0 0 15px 0;
+        p {
+            color: #8fa0dd;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
             line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
         }
 
-        .result-link {
-            display: inline-block;
-            padding: 10px 18px;
-            background-color: #ff9900; /* Styled like a standard buy/action button */
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 14px;
+        .btn {
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-family: inherit;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
         }
 
-        .result-link:hover {
-            background-color: #e68a00;
+        .btn:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-color);
+            box-shadow: 0 0 25px var(--neon-cyan);
+            transform: translateY(-2px);
         }
 
-        .error {
-            color: #dc3545;
-            margin-top: 15px;
-            display: none;
-            font-size: 14px;
+        #hud {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .hud-element {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(255,255,255,0.6);
+        }
+
+        #scoreVal { color: var(--neon-cyan); }
+        #multiplierVal { color: var(--neon-yellow); }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
         }
     </style>
-
-  
 </head>
 <body>
 
-    <div class="container">
-        <h2>Link Extractor</h2>
-        <div class="input-group">
-            <input type="url" id="urlInput" placeholder="Paste a URL here (e.g., https://example.com)" required="">
-            <button onclick="extractDetails()">Extract</button>
+    <div id="gameContainer">
+        <div id="hud">
+            <div class="hud-element">SCORE: <span id="scoreVal">0</span></div>
+            <div class="hud-element">MULT: <span id="multiplierVal">1.0x</span></div>
         </div>
 
-        <div class="loader" id="loader"></div>
-        <div class="error" id="errorMsg"></div>
-
-        <div class="result-card" id="resultCard">
-            <img src="" alt="Preview Image" class="result-img" id="resultImg">
-            <div class="result-content">
-                <h3 class="result-title" id="resultTitle">Title goes here</h3>
-                <p class="result-desc" id="resultDesc">Description goes here...</p>
-                <a href="#" target="_blank" class="result-link" id="resultLink">Visit Link</a>
+        <div id="startScreen" class="ui-layer">
+            <div class="screen">
+                <h1>Cyberpulse</h1>
+                <p>Dodge the glitch vectors.<br>Absorb the cosmic sync nodes.<br>Survive the acceleration.</p>
+                <button class="btn" onclick="startGame()">Initialize</button>
             </div>
         </div>
+
+        <div id="gameOverScreen" class="ui-layer hidden">
+            <div class="screen">
+                <h1 style="text-shadow: 0 0 10px var(--neon-magenta)">Core Elision</h1>
+                <p>Your signature was scrubbed from the grid.<br><br><span id="finalScore" style="color:var(--neon-cyan); font-size:1.2rem;">Score: 0</span></p>
+                <button class="btn" style="border-color: var(--neon-magenta); color: var(--neon-magenta);" onclick="startGame()">Reboot</button>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
     </div>
 
     <script>
-        // JavaScript Logic
-        async function extractDetails() {
-            const urlInput = document.getElementById('urlInput').value;
-            const loader = document.getElementById('loader');
-            const resultCard = document.getElementById('resultCard');
-            const errorMsg = document.getElementById('errorMsg');
-            
-            // UI Reset
-            loader.style.display = 'block';
-            resultCard.style.display = 'none';
-            errorMsg.style.display = 'none';
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreVal = document.getElementById('scoreVal');
+        const multiplierVal = document.getElementById('multiplierVal');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalScore = document.getElementById('finalScore');
 
-            if (!urlInput) {
-                showError('Please enter a valid URL.');
-                return;
+        let gameActive = false;
+        let score = 0;
+        let multiplier = 1.0;
+        let speedModifier = 1;
+        let player, obstacles, particles, collectibles;
+        let animationFrameId;
+
+        // Custom canvas sizing for sharp resolution
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Mouse/Touch controls
+        const input = { x: canvas.width / 2, y: canvas.height * 0.8 };
+        const handleMove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            input.x = clientX - rect.left;
+        };
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('touchmove', handleMove, { passive: true });
+
+        class Player {
+            constructor() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height * 0.8;
+                this.radius = 12;
+                this.color = '#00f0ff';
+            }
+            update() {
+                // Smooth easing towards input position
+                this.x += (input.x - this.x) * 0.2;
+                // Keep inside canvas
+                if (this.x < this.radius) this.x = this.radius;
+                if (this.x > canvas.width - this.radius) this.x = canvas.width - this.radius;
+            }
+            draw() {
+                ctx.save();
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = this.color;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y - this.radius);
+                ctx.lineTo(this.x - this.radius, this.y + this.radius);
+                ctx.lineTo(this.x + this.radius, this.y + this.radius);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Obstacle {
+            constructor() {
+                this.width = Math.random() * 80 + 40;
+                this.height = 12;
+                this.x = Math.random() * (canvas.width - this.width);
+                this.y = -this.height;
+                this.speed = (Math.random() * 3 + 4) * speedModifier;
+                this.color = '#ff007f';
+            }
+            update() {
+                this.y += this.speed;
+            }
+            draw() {
+                ctx.save();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.restore();
+            }
+        }
+
+        class Collectible {
+            constructor() {
+                this.x = Math.random() * (canvas.width - 20) + 10;
+                this.y = -10;
+                this.radius = 6;
+                this.speed = (Math.random() * 2 + 3) * speedModifier;
+                this.color = '#ffec00';
+            }
+            update() {
+                this.y += this.speed;
+            }
+            draw() {
+                ctx.save();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 3 + 1;
+                this.vx = (Math.random() - 0.5) * 8;
+                this.vy = (Math.random() - 0.5) * 8;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function spawnEntities() {
+            if (!gameActive) return;
+            if (Math.random() < 0.04) obstacles.push(new Obstacle());
+            if (Math.random() < 0.02) collectibles.push(new Collectible());
+            
+            // Background ambient particles
+            if (Math.random() < 0.1) {
+                let p = new Particle(Math.random() * canvas.width, 0, 'rgba(255,255,255,0.3)');
+                p.vy = Math.random() * 2 + 1;
+                p.vx = 0;
+                particles.push(p);
+            }
+            setTimeout(spawnEntities, 200);
+        }
+
+        function checkCollision(circle, rect) {
+            let distX = Math.abs(circle.x - rect.x - rect.width / 2);
+            let distY = Math.abs(circle.y - (rect.y + rect.height / 2));
+
+            if (distX > (rect.width / 2 + circle.radius)) return false;
+            if (distY > (rect.height / 2 + circle.radius)) return false;
+
+            if (distX <= (rect.width / 2)) return true;
+            if (distY <= (rect.height / 2)) return true;
+
+            let dx = distX - rect.width / 2;
+            let dy = distY - rect.height / 2;
+            return (dx * dx + dy * dy <= (circle.radius * circle.radius));
+        }
+
+        function createExplosion(x, y, color, count = 20) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function triggerGameOver() {
+            gameActive = false;
+            cancelAnimationFrame(animationFrameId);
+            createExplosion(player.x, player.y, '#00f0ff', 40);
+            createExplosion(player.x, player.y, '#ff007f', 40);
+            
+            finalScore.innerText = `Final Score: ${Math.floor(score)}`;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        function updateGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Subtle Grid Lines for Synthwave Vibe
+            ctx.strokeStyle = 'rgba(112, 0, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for(let i=0; i<canvas.width; i+=40) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            }
+            for(let i=0; i<canvas.height; i+=40) {
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
             }
 
-            try {
-                // Using a public CORS proxy to fetch the HTML content
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlInput)}`;
-                const response = await fetch(proxyUrl);
-                
-                if (!response.ok) throw new Error('Network response was not ok');
-                
-                const data = await response.json();
-                const htmlContent = data.contents;
+            player.update();
+            player.draw();
 
-                // Parse the fetched HTML
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlContent, 'text/html');
+            // Progress Score gently over time
+            score += 0.1 * multiplier;
+            speedModifier = 1 + (score / 1000); // Scale difficulty
+            scoreVal.innerText = Math.floor(score);
+            multiplierVal.innerText = `${multiplier.toFixed(1)}x`;
 
-                // Extract Metadata (Prioritizing OpenGraph tags)
-                const title = doc.querySelector('meta[property="og:title"]')?.content || 
-                              doc.querySelector('title')?.innerText || 
-                              'No Title Found';
-                              
-                const description = doc.querySelector('meta[property="og:description"]')?.content || 
-                                    doc.querySelector('meta[name="description"]')?.content || 
-                                    'No description available for this page.';
-                                    
-                const image = doc.querySelector('meta[property="og:image"]')?.content || '';
+            // Process Obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].update();
+                obstacles[i].draw();
 
-                // Populate the UI
-                document.getElementById('resultTitle').innerText = title;
-                document.getElementById('resultDesc').innerText = description;
-                document.getElementById('resultLink').href = urlInput;
-
-                const imgElement = document.getElementById('resultImg');
-                if (image) {
-                    imgElement.src = image;
-                    imgElement.style.display = 'block';
-                } else {
-                    imgElement.style.display = 'none';
+                if (checkCollision(player, obstacles[i])) {
+                    triggerGameOver();
+                    return;
                 }
 
-                // Hide loader, show result
-                loader.style.display = 'none';
-                resultCard.style.display = 'block';
+                if (obstacles[i].y > canvas.height) {
+                    obstacles.splice(i, 1);
+                }
+            }
 
-            } catch (error) {
-                console.error("Extraction error:", error);
-                showError('Failed to extract details. The website might be blocking automated requests.');
+            // Process Collectibles
+            for (let i = collectibles.length - 1; i >= 0; i--) {
+                collectibles[i].update();
+                collectibles[i].draw();
+
+                // Check collision with player
+                let dist = Math.hypot(player.x - collectibles[i].x, player.y - collectibles[i].y);
+                if (dist < player.radius + collectibles[i].radius) {
+                    createExplosion(collectibles[i].x, collectibles[i].y, '#ffec00', 12);
+                    score += 50 * multiplier;
+                    multiplier = Math.min(multiplier + 0.2, 5.0);
+                    collectibles.splice(i, 1);
+                    continue;
+                }
+
+                // If missed, drop multiplier back down
+                if (collectibles[i].y > canvas.height) {
+                    multiplier = Math.max(1.0, multiplier - 0.1);
+                    collectibles.splice(i, 1);
+                }
+            }
+
+            // Process Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            if (gameActive) {
+                animationFrameId = requestAnimationFrame(updateGame);
             }
         }
 
-        function showError(message) {
-            const loader = document.getElementById('loader');
-            const errorMsg = document.getElementById('errorMsg');
-            loader.style.display = 'none';
-            errorMsg.innerText = message;
-            errorMsg.style.display = 'block';
+        function startGame() {
+            resizeCanvas();
+            player = new Player();
+            obstacles = [];
+            particles = [];
+            collectibles = [];
+            score = 0;
+            multiplier = 1.0;
+            speedModifier = 1;
+            gameActive = true;
+
+            input.x = canvas.width / 2;
+
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+
+            spawnEntities();
+            updateGame();
         }
     </script>
-
-  
-
 </body>
 </html>
