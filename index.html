@@ -134,7 +134,7 @@
   <!-- TOP TEMPLATE HEADER -->
   <header id="template-header">
     <div class="template-title">Hare Krishna Nature Farm</div>
-    <div class="template-subtitle">Live Satellite Sanctuary Map • Golden Property Perimeter</div>
+    <div class="template-subtitle">Live Satellite Portal • Locked Sanctuary Perimeter</div>
   </header>
 
   <!-- MAIN RECTANGULAR MAP VIEWPORT -->
@@ -146,7 +146,7 @@
 
       <!-- Floating Information Tag -->
       <div class="hud-overlay">
-        <span class="hud-text">🌟 <strong>Golden Boundary:</strong> Exact 29-Point Property Line • Click & Drag to Explore</span>
+        <span class="hud-text">🔒 <strong>Map Locked:</strong> Mobile & Desktop Navigation Restricted to Sanctuary Perimeter</span>
       </div>
 
     </div>
@@ -190,51 +190,41 @@
     ];
 
     // ==========================================================================
-    // 2. YOUR EXACT 29-POINT PROPERTY BOUNDARY (CONVERTED TO DECIMAL DEGREES)
-    // Traced sequentially point-by-point exactly as provided!
+    // 2. YOUR EXACT 29-POINT PROPERTY BOUNDARY (GOLDEN LINE)
     // ==========================================================================
     const farmBoundaryCoordinates = [
-      [12.402578, 76.752256], // 1.  12°24'09.28"N 76°45'08.12"E
-      [12.401856, 76.751600], // 2.  12°24'06.68"N 76°45'05.76"E
-      [12.401294, 76.751453], // 3.  12°24'04.66"N 76°45'05.23"E
-      [12.401236, 76.752019], // 4.  12°24'04.45"N 76°45'07.27"E
-      [12.400550, 76.752319], // 5.  12°24'01.98"N 76°45'08.35"E
-      [12.400881, 76.753078], // 6.  12°24'03.17"N 76°45'11.08"E
-      [12.399453, 76.753817], // 7.  12°23'58.03"N 76°45'13.74"E
-      [12.399375, 76.754164], // 8.  12°23'57.75"N 76°45'14.99"E
-      [12.396069, 76.756006], // 9.  12°23'45.85"N 76°45'21.62"E
-      [12.395019, 76.756042], // 10. 12°23'42.07"N 76°45'21.75"E
-      [12.394922, 76.757878], // 11. 12°23'41.72"N 76°45'28.36"E
-      [12.394508, 76.758061], // 12. 12°23'40.23"N 76°45'29.02"E
-      [12.394672, 76.758903], // 13. 12°23'40.82"N 76°45'32.05"E
-      [12.395489, 76.758942], // 14. 12°23'43.76"N 76°45'32.19"E
-      [12.395856, 76.760583], // 15. 12°23'45.08"N 76°45'38.10"E
-      [12.398022, 76.760436], // 16. 12°23'52.88"N 76°45'37.57"E
-      [12.398219, 76.760208], // 17. 12°23'53.59"N 76°45'36.75"E
-      [12.398961, 76.760814], // 18. 12°23'56.26"N 76°45'38.93"E
-      [12.399917, 76.760825], // 19. 12°23'59.70"N 76°45'38.97"E
-      [12.400269, 76.760572], // 20. 12°24'00.97"N 76°45'38.06"E
-      [12.400672, 76.760844], // 21. 12°24'02.42"N 76°45'39.04"E
-      [12.401369, 76.760403], // 22. 12°24'04.93"N 76°45'37.45"E
-      [12.401853, 76.760408], // 23. 12°24'06.67"N 76°45'37.47"E
-      [12.401436, 76.761311], // 24. 12°24'05.17"N 76°45'40.72"E
-      [12.401561, 76.761572], // 25. 12°24'05.62"N 76°45'41.66"E
-      [12.401175, 76.763236], // 26. 12°24'04.23"N 76°45'47.65"E
-      [12.402489, 76.763308], // 27. 12°24'08.96"N 76°45'47.91"E
-      [12.402636, 76.763100], // 28. 12°24'09.49"N 76°45'47.16"E
-      [12.402767, 76.763075]  // 29. 12°24'09.96"N 76°45'47.07"E
+      [12.402578, 76.752256], [12.401856, 76.751600], [12.401294, 76.751453],
+      [12.401236, 76.752019], [12.400550, 76.752319], [12.400881, 76.753078],
+      [12.399453, 76.753817], [12.399375, 76.754164], [12.396069, 76.756006],
+      [12.395019, 76.756042], [12.394922, 76.757878], [12.394508, 76.758061],
+      [12.394672, 76.758903], [12.395489, 76.758942], [12.395856, 76.760583],
+      [12.398022, 76.760436], [12.398219, 76.760208], [12.398961, 76.760814],
+      [12.399917, 76.760825], [12.400269, 76.760572], [12.400672, 76.760844],
+      [12.401369, 76.760403], [12.401853, 76.760408], [12.401436, 76.761311],
+      [12.401561, 76.761572], [12.401175, 76.763236], [12.402489, 76.763308],
+      [12.402636, 76.763100], [12.402767, 76.763075]
     ];
 
     // ==========================================================================
-    // 3. MAP INITIALIZATION & GOOGLE SATELLITE ENGINE
+    // 3. MAP ACCESS LOCK (RESTRICTING VIEWPORT TO YOUR 4 BORDER COORDINATES)
     // ==========================================================================
+    
+    // Define the exact South-West (Bottom-Left) and North-East (Top-Right) corners
+    const southWestCorner = L.latLng(12.390428, 76.749592); // From 12°23'25.54"N 76°44'59.99"E
+    const northEastCorner = L.latLng(12.408306, 76.766311); // From 12°24'29.90"N 76°45'58.72"E
+    const restrictedBounds = L.latLngBounds(southWestCorner, northEastCorner);
+
     const centerLat = sanctuaryLocations[0].lat;
     const centerLon = sanctuaryLocations[0].lon;
-    const zoomLevel = 15;
 
+    // Initialize Map with SOLID WALL BOUNDS and ZOOM LIMITS
     const map = L.map('real-satellite-map', {
       center: [centerLat, centerLon],
-      zoom: zoomLevel,
+      zoom: 15,
+      minZoom: 14,                      // Prevents mobile users from pinching out too far
+      maxZoom: 20,                      // Allows close-up inspection of trees & buildings
+      maxBounds: restrictedBounds,      // Sets the invisible four-walled border
+      maxBoundsViscosity: 1.0,          // 1.0 = Solid Wall! Camera refuses to drag outside!
       zoomControl: true,
       attributionControl: false
     });
@@ -245,11 +235,18 @@
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     }).addTo(map);
 
+    // Optional: Draw a subtle dashed frame around the extreme outer border so users see the edge
+    L.rectangle(restrictedBounds, {
+      color: "#ffd700",
+      weight: 1.5,
+      dashArray: '6, 6',
+      fill: false,
+      opacity: 0.4
+    }).addTo(map);
+
     // ==========================================================================
     // 4. DRAW THE GOLDEN PROPERTY BOUNDARY
     // ==========================================================================
-    
-    // A. Soft Golden Outer Glow Layer (adds depth)
     L.polygon(farmBoundaryCoordinates, {
       color: '#ffd700',       
       weight: 8,              
@@ -257,16 +254,15 @@
       fill: false             
     }).addTo(map);
 
-    // B. Sharp Golden Property Border Line
     const propertyBoundary = L.polygon(farmBoundaryCoordinates, {
-      color: '#ffd700',       // Vibrant Gold Stroke
-      weight: 3.5,            // Clean line thickness
-      opacity: 1.0,           // 100% solid visibility
-      fillColor: '#ffd700',   // Golden interior tint
-      fillOpacity: 0.10       // 10% tint keeps satellite trees clear
+      color: '#ffd700',       
+      weight: 3.5,            
+      opacity: 1.0,           
+      fillColor: '#ffd700',   
+      fillOpacity: 0.10       
     }).addTo(map);
 
-    propertyBoundary.bindPopup("<b>Hare Krishna Nature Farm</b><br>Official 29-Point Boundary Perimeter");
+    propertyBoundary.bindPopup("<b>Hare Krishna Nature Farm</b><br>Official Protected Sanctuary Perimeter");
 
     // ==========================================================================
     // 5. PLACE ALL SANCTUARY MARKERS ON THE MAP
@@ -299,7 +295,7 @@
       }
     });
 
-    // Automatically zoom and center the screen so your entire 29-point golden border fits perfectly!
+    // Automatically zoom and center the screen to fit the golden boundary inside the locked walls
     map.fitBounds(propertyBoundary.getBounds(), { padding: [30, 30] });
   </script>
 
