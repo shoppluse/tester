@@ -32,12 +32,60 @@
       flex-direction: column; 
     }
 
+    /* --- CINEMATIC CLOUD UNCOVERING INTRO SCREEN --- */
+    #cloud-intro {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.95) 0%, rgba(200, 215, 225, 0.9) 40%, rgba(10, 25, 20, 0.98) 100%);
+      z-index: 99999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      transition: opacity 2.2s cubic-bezier(0.4, 0, 0.2, 1), transform 2.2s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: all;
+    }
+
+    .intro-content {
+      animation: floatUp 2.5s ease-out forwards;
+    }
+
+    .intro-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 0 30px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.8);
+      line-height: 1.3;
+    }
+
+    .intro-subtitle {
+      font-size: 1.1rem;
+      color: #0d2218;
+      font-weight: 700;
+      letter-spacing: 6px;
+      margin-top: 10px;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(25px) scale(0.95); }
+      30% { opacity: 1; transform: translateY(0px) scale(1); }
+      80% { opacity: 1; transform: translateY(0px) scale(1); }
+      100% { opacity: 0; transform: translateY(-20px) scale(1.05); }
+    }
+
     /* --- TOP HEADER BANNER --- */
     #template-header {
       width: 100%; 
       height: 75px;
       background: linear-gradient(180deg, #11221b 0%, #08120e 100%);
-      border-bottom: 3px solid var(--accent-gold);
+      border-bottom: 2px solid var(--accent-gold);
       display: flex; 
       flex-direction: column;
       justify-content: center; 
@@ -84,7 +132,7 @@
       overflow: hidden;
       position: relative;
       box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-      border: 1px solid rgba(255, 215, 0, 0.4);
+      border: 1px solid rgba(255, 215, 0, 0.3);
       background: #08120e;
     }
 
@@ -102,7 +150,7 @@
       transform: translateX(-50%);
       background: rgba(6, 16, 12, 0.88);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 215, 0, 0.5);
+      border: 1px solid rgba(255, 215, 0, 0.4);
       padding: 10px 24px;
       border-radius: 30px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.8);
@@ -121,15 +169,35 @@
       color: var(--accent-gold);
     }
 
-    /* Customizing Leaflet UI to match dark theme */
+    /* Customizing Leaflet UI & Clean Popups */
     .leaflet-control-zoom a {
       background-color: rgba(6, 16, 12, 0.9) !important;
       color: var(--accent-gold) !important;
-      border-color: rgba(255, 215, 0, 0.4) !important;
+      border-color: rgba(255, 215, 0, 0.3) !important;
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: rgba(8, 18, 14, 0.95) !important;
+      color: #fff !important;
+      border: 1px solid var(--accent-gold);
+      border-radius: 8px !important;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.8) !important;
+    }
+
+    .leaflet-popup-tip {
+      background: rgba(8, 18, 14, 0.95) !important;
     }
   </style>
 </head>
 <body>
+
+  <!-- CINEMATIC CLOUD UNCOVERING INTRO SCREEN -->
+  <div id="cloud-intro">
+    <div class="intro-content">
+      <div class="intro-subtitle">Welcome To</div>
+      <h1 class="intro-title">Hare Krishna<br>Nature Farm</h1>
+    </div>
+  </div>
 
   <!-- TOP TEMPLATE HEADER -->
   <header id="template-header">
@@ -146,7 +214,7 @@
 
       <!-- Floating Information Tag -->
       <div class="hud-overlay">
-        <span class="hud-text">🔒 <strong>Map Locked:</strong> Mobile & Desktop Navigation Restricted to Sanctuary Perimeter</span>
+        <span class="hud-text">✨ <strong>Sanctuary Map:</strong> Click Any Location Marker to Smoothly Zoom In</span>
       </div>
 
     </div>
@@ -190,7 +258,7 @@
     ];
 
     // ==========================================================================
-    // 2. YOUR EXACT 29-POINT PROPERTY BOUNDARY (GOLDEN LINE)
+    // 2. YOUR EXACT 29-POINT PROPERTY BOUNDARY
     // ==========================================================================
     const farmBoundaryCoordinates = [
       [12.402578, 76.752256], [12.401856, 76.751600], [12.401294, 76.751453],
@@ -206,25 +274,23 @@
     ];
 
     // ==========================================================================
-    // 3. MAP ACCESS LOCK (RESTRICTING VIEWPORT TO YOUR 4 BORDER COORDINATES)
+    // 3. MAP ACCESS LOCK (RESTRICTING VIEWPORT)
     // ==========================================================================
-    
-    // Define the exact South-West (Bottom-Left) and North-East (Top-Right) corners
-    const southWestCorner = L.latLng(12.390428, 76.749592); // From 12°23'25.54"N 76°44'59.99"E
-    const northEastCorner = L.latLng(12.408306, 76.766311); // From 12°24'29.90"N 76°45'58.72"E
+    const southWestCorner = L.latLng(12.390428, 76.749592);
+    const northEastCorner = L.latLng(12.408306, 76.766311);
     const restrictedBounds = L.latLngBounds(southWestCorner, northEastCorner);
 
     const centerLat = sanctuaryLocations[0].lat;
     const centerLon = sanctuaryLocations[0].lon;
 
-    // Initialize Map with SOLID WALL BOUNDS and ZOOM LIMITS
+    // Initialize map slightly zoomed out for the intro drop effect
     const map = L.map('real-satellite-map', {
       center: [centerLat, centerLon],
-      zoom: 15,
-      minZoom: 14,                      // Prevents mobile users from pinching out too far
-      maxZoom: 20,                      // Allows close-up inspection of trees & buildings
-      maxBounds: restrictedBounds,      // Sets the invisible four-walled border
-      maxBoundsViscosity: 1.0,          // 1.0 = Solid Wall! Camera refuses to drag outside!
+      zoom: 13,                         // Starts higher up in the clouds
+      minZoom: 14,
+      maxZoom: 20,
+      maxBounds: restrictedBounds,
+      maxBoundsViscosity: 1.0,
       zoomControl: true,
       attributionControl: false
     });
@@ -235,68 +301,88 @@
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     }).addTo(map);
 
-    // Optional: Draw a subtle dashed frame around the extreme outer border so users see the edge
-    L.rectangle(restrictedBounds, {
-      color: "#ffd700",
-      weight: 1.5,
-      dashArray: '6, 6',
-      fill: false,
-      opacity: 0.4
-    }).addTo(map);
-
     // ==========================================================================
-    // 4. DRAW THE GOLDEN PROPERTY BOUNDARY
+    // 4. DRAW THE THIN, ELEGANT GOLDEN BOUNDARY
     // ==========================================================================
+    
+    // A. Thinner, Softer Golden Outer Glow (Reduced weight to 4px)
     L.polygon(farmBoundaryCoordinates, {
       color: '#ffd700',       
-      weight: 8,              
-      opacity: 0.35,          
+      weight: 4,              
+      opacity: 0.25,          
       fill: false             
     }).addTo(map);
 
+    // B. Crisp, Thin Golden Property Line (Reduced weight to 1.8px)
     const propertyBoundary = L.polygon(farmBoundaryCoordinates, {
       color: '#ffd700',       
-      weight: 3.5,            
-      opacity: 1.0,           
+      weight: 1.8,            
+      opacity: 0.9,           
       fillColor: '#ffd700',   
-      fillOpacity: 0.10       
+      fillOpacity: 0.08       
     }).addTo(map);
 
-    propertyBoundary.bindPopup("<b>Hare Krishna Nature Farm</b><br>Official Protected Sanctuary Perimeter");
-
     // ==========================================================================
-    // 5. PLACE ALL SANCTUARY MARKERS ON THE MAP
+    // 5. PLACE THIN MARKERS & ADD "CLICK TO ZOOM" NAVIGATION
     // ==========================================================================
     sanctuaryLocations.forEach(spot => {
+      // Made marker dots much thinner and smaller!
       const markerColor = spot.isCenter ? "#ffd700" : "#ffffff";
-      const markerRadius = spot.isCenter ? 9 : 7;
+      const markerRadius = spot.isCenter ? 5.5 : 4.0;
 
       const marker = L.circleMarker([spot.lat, spot.lon], {
         radius: markerRadius,
         fillColor: markerColor,
         color: "#ffd700",     
-        weight: 2,
+        weight: 1.2,          // Super thin trim around the dot
         opacity: 1,
         fillOpacity: 0.95
       }).addTo(map);
 
+      // Clean Popup without raw coordinates!
       const popupContent = `
-        <div style="text-align: center; font-family: sans-serif;">
-          <strong style="color: #08120e; font-size: 14px;">${spot.name}</strong><br>
-          <span style="color: #555; font-size: 12px;">${spot.description}</span><br>
-          <code style="font-size: 10px; color: #888;">${spot.lat.toFixed(4)}°, ${spot.lon.toFixed(4)}°</code>
+        <div style="text-align: center; padding: 4px; font-family: sans-serif;">
+          <strong style="color: #ffd700; font-size: 14px; letter-spacing: 0.5px;">${spot.name}</strong><br>
+          <span style="color: #ddd; font-size: 11px; display: block; margin: 4px 0;">${spot.description}</span>
+          <span style="color: #88ff88; font-size: 10px; font-weight: bold; text-transform: uppercase;">↗ Click to Zoom Here</span>
         </div>
       `;
       
       marker.bindPopup(popupContent);
 
-      if (spot.isCenter) {
-        marker.openPopup();
-      }
+      // CLICK TO ZOOM EFFECT: Clicking any marker smoothly flies camera down to ground level!
+      marker.on('click', () => {
+        map.flyTo([spot.lat, spot.lon], 18, {
+          animate: true,
+          duration: 1.6,
+          easeLinearity: 0.25
+        });
+      });
     });
 
-    // Automatically zoom and center the screen to fit the golden boundary inside the locked walls
-    map.fitBounds(propertyBoundary.getBounds(), { padding: [30, 30] });
+    // ==========================================================================
+    // 6. EXECUTE THE CLOUD UNCOVERING & DRONE DESCENT ANIMATION
+    // ==========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const cloudIntro = document.getElementById('cloud-intro');
+        
+        // 1. Dissolve and part the cloud screen
+        cloudIntro.style.opacity = '0';
+        cloudIntro.style.transform = 'scale(1.1)';
+        cloudIntro.style.pointerEvents = 'none';
+
+        // 2. Fly camera down out of the clouds to fit the golden boundary
+        map.flyToBounds(propertyBoundary.getBounds(), {
+          padding: [30, 30],
+          duration: 2.2,
+          easeLinearity: 0.2
+        });
+
+        // Remove intro DOM element after fade finishes
+        setTimeout(() => cloudIntro.remove(), 2200);
+      }, 2300); // 2.3 seconds display time for the welcome text
+    });
   </script>
 
 </body>
