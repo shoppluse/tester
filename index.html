@@ -131,8 +131,17 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    // ==========================================================================
+    // 1. SANCTUARY LOCATIONS LIST (WITH UPDATED TEMPLE COORDINATE)
+    // ==========================================================================
     const sanctuaryLocations = [
-      { name: "Krishna Balaram Temple", lat: 12.398800, lon: 76.757700, description: "Sanctuary Center & Temple Complex", isCenter: true },
+      { 
+        name: "Krishna Balaram Temple", 
+        lat: 12.398114,       // Updated from 12°23'53.21"N
+        lon: 76.757853,       // Updated from 76°45'28.27"E
+        description: "Sanctuary Center & Temple Complex", 
+        isCenter: true 
+      },
       { name: "Akshaya Patra Foundation", lat: 12.396878, lon: 76.760297, description: "Community Kitchen & Service Initiative", isCenter: false },
       { name: "Kaveri River", lat: 12.402789, lon: 76.758100, description: "Sacred Waters & Riverside Sanctuary", isCenter: false },
       { name: "Goshala", lat: 12.397269, lon: 76.757431, description: "Cow Protection & Dairy Sanctuary", isCenter: false }
