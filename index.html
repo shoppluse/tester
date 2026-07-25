@@ -3,837 +3,305 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hare Krishna Nature Farm | Ultra-Realistic 360° Virtual Tour</title>
+  <title>Hare Krishna Nature Farm | Live Satellite Portal</title>
+  
+  <!-- Leaflet Map Engine CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
   <style>
     /* ==========================================================================
-       1. CORE DESIGN SYSTEM & GLASSMORPHISM UI
+       1. CORE TEMPLATE LAYOUT & THEME
        ========================================================================== */
     :root {
-      --bg-dark: #020605;
+      --bg-dark: #050a08;
       --accent-gold: #ffd700;
-      --accent-glow: rgba(255, 215, 0, 0.55);
-      --accent-cyan: #00f2fe;
+      --accent-glow: rgba(255, 215, 0, 0.45);
       --text-main: #ffffff;
-      --text-muted: #a3b8b0;
-      --glass-panel: rgba(6, 16, 12, 0.82);
-      --glass-border: rgba(255, 255, 255, 0.15);
       --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); -webkit-font-smoothing: antialiased; }
-    body, html { width: 100%; height: 100%; overflow: hidden; background-color: var(--bg-dark); color: var(--text-main); user-select: none; }
-
-    /* ==========================================================================
-       2. STRATOSPHERE PRELOADER & GOLDEN TITLE REVEAL
-       ========================================================================== */
-    #loader-screen {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: radial-gradient(circle at center, #081c15 0%, #030a07 65%, #000000 100%);
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      z-index: 99999; transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 1.5s;
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
+    
+    body, html { 
+      width: 100%; 
+      height: 100%; 
+      overflow: hidden; 
+      background-color: var(--bg-dark); 
+      color: var(--text-main); 
+      display: flex; 
+      flex-direction: column; 
     }
-    #loader-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-    .loader-title-pre {
-      font-size: 2.2rem; font-weight: 800; letter-spacing: 8px; text-transform: uppercase;
+    /* --- TOP HEADER BANNER --- */
+    #template-header {
+      width: 100%; 
+      height: 75px;
+      background: linear-gradient(180deg, #11221b 0%, #08120e 100%);
+      border-bottom: 3px solid var(--accent-gold);
+      display: flex; 
+      flex-direction: column;
+      justify-content: center; 
+      align-items: center;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.8);
+      z-index: 1000; 
+      flex-shrink: 0;
+    }
+
+    .template-title {
+      font-size: 1.8rem; 
+      font-weight: 800; 
+      letter-spacing: 6px; 
+      text-transform: uppercase;
       background: linear-gradient(180deg, #ffffff 0%, var(--accent-gold) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 24px; filter: drop-shadow(0 0 25px var(--accent-glow));
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px var(--accent-glow);
     }
 
-    .progress-bar-wrap {
-      width: 300px; height: 4px; background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px; overflow: hidden; position: relative;
-    }
-    .progress-bar-fill {
-      width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
-      box-shadow: 0 0 12px var(--accent-gold); transition: width 0.3s ease-out;
-    }
-    .loader-status { font-size: 0.75rem; letter-spacing: 3px; color: var(--text-muted); margin-top: 16px; text-transform: uppercase; }
-
-    /* Cinematic Title Overlay */
-    #cinematic-title-overlay {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      display: flex; justify-content: center; align-items: center;
-      z-index: 5000; pointer-events: none; opacity: 0; transition: opacity 1.2s;
-    }
-    .title-word-box { display: flex; gap: 10px; }
-    .title-char {
-      font-size: 3.8rem; font-weight: 900; letter-spacing: 6px; text-transform: uppercase;
-      color: #fff; text-shadow: 0 0 20px var(--accent-gold), 0 0 45px var(--accent-gold);
-      opacity: 0; transform: rotateY(90deg) scale(0.7); display: inline-block;
-    }
-    @keyframes char-emerge {
-      0% { opacity: 0; transform: rotateY(180deg) scale(0.4); filter: blur(15px); }
-      60% { opacity: 1; transform: rotateY(-10deg) scale(1.08); filter: blur(0px); }
-      100% { opacity: 1; transform: rotateY(0deg) scale(1); filter: blur(0px); }
+    .template-subtitle {
+      font-size: 0.75rem;
+      color: var(--accent-gold);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 2px;
+      font-weight: 600;
     }
 
-    /* ==========================================================================
-       3. VIEWPORT & HUD NAVIGATION OVERLAY
-       ========================================================================== */
-    #viewport { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-    #hud-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 32px; }
-    .interactive-element { pointer-events: auto; }
-
-    header { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
-    .location-card {
-      background: var(--glass-panel); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); padding: 14px 28px; border-radius: 40px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.75); display: flex; flex-direction: column;
-    }
-    .location-card h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
-    .location-card span { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1.5px; margin-top: 3px; text-transform: uppercase; }
-
-    .nav-pill-wrap {
-      background: var(--glass-panel); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
-      border-radius: 50px; padding: 6px; display: flex; gap: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.85);
-    }
-    .nav-item-btn {
-      background: transparent; border: none; color: var(--text-muted); padding: 10px 18px;
-      border-radius: 40px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .nav-item-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
-    .nav-item-btn.active { background: linear-gradient(135deg, var(--accent-gold), #ff9000); color: #000; font-weight: 700; box-shadow: 0 0 20px var(--accent-glow); }
-
-    footer { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
-    .flight-status-box {
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1);
-      padding: 12px 24px; border-radius: 30px; font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px;
-    }
-    .flight-status-box strong { color: var(--accent-cyan); }
-
-    .btn-return-aerial {
-      background: var(--glass-panel); border: 1px solid var(--accent-gold); color: var(--accent-gold);
-      padding: 14px 28px; border-radius: 30px; font-weight: 700; font-size: 0.85rem; letter-spacing: 1px;
-      cursor: pointer; display: none; align-items: center; gap: 8px; transition: all 0.3s;
-      text-transform: uppercase; box-shadow: 0 0 25px rgba(255,215,0,0.25);
-    }
-    .btn-return-aerial:hover { background: var(--accent-gold); color: #000; box-shadow: 0 0 35px var(--accent-glow); transform: translateY(-2px); }
-
-    /* ==========================================================================
-       4. 2D HOLOGRAPHIC MARKERS & WAYPOINT HOTSPOTS
-       ========================================================================== */
-    #marker-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
-    
-    .holo-marker {
-      position: absolute; top: 0; left: 0; width: 56px; height: 56px;
-      transform: translate(-50%, -50%) scale(0); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      cursor: pointer; pointer-events: auto; display: flex; align-items: center; justify-content: center;
-    }
-    .holo-marker.visible { transform: translate(-50%, -50%) scale(1); }
-    
-    .ring-outer {
-      position: absolute; width: 100%; height: 100%; border-radius: 50%;
-      border: 1.5px solid var(--accent-gold); animation: holo-ripple 2.5s infinite linear;
-    }
-    .ring-inner {
-      width: 22px; height: 22px; border-radius: 50%; background: rgba(255, 215, 0, 0.3);
-      border: 2px solid var(--accent-gold); box-shadow: 0 0 18px var(--accent-gold);
-      transition: all 0.3s;
-    }
-    .holo-marker:hover .ring-inner { background: var(--accent-gold); transform: scale(1.4); box-shadow: 0 0 28px #fff; }
-    
-    @keyframes holo-ripple {
-      0% { transform: scale(0.5) rotate(0deg); opacity: 1; border-color: var(--accent-gold); }
-      100% { transform: scale(2.4) rotate(180deg); opacity: 0; border-color: var(--accent-cyan); }
+    /* --- RECTANGULAR MAP SECTION --- */
+    #map-section {
+      width: 100%; 
+      flex-grow: 1; 
+      position: relative; 
+      background: #000;
+      padding: 12px;
     }
 
-    .marker-label {
-      position: absolute; bottom: 112%; left: 50%; transform: translateX(-50%) translateY(6px);
-      background: var(--glass-panel); border: 1px solid var(--glass-border); padding: 6px 16px;
-      border-radius: 8px; font-size: 0.75rem; font-weight: 700; white-space: nowrap;
-      color: #fff; opacity: 0; transition: all 0.2s; pointer-events: none; backdrop-filter: blur(10px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    /* The Map Container Box */
+    .map-container {
+      width: 100%; 
+      height: 100%; 
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      background: #08120e;
     }
-    .holo-marker:hover .marker-label { opacity: 1; transform: translateX(-50%) translateY(-5px); }
 
-    /* ==========================================================================
-       5. DETAILED GLASSMORPHISM BRIEFING MODAL
-       ========================================================================== */
-    #modal-backdrop {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.4s ease;
-      display: flex; align-items: center; justify-content: center; padding: 24px;
+    #real-satellite-map {
+      width: 100%;
+      height: 100%;
+      z-index: 1;
     }
-    #modal-backdrop.active { opacity: 1; visibility: visible; }
 
-    .modal-card {
-      width: 100%; max-width: 620px; background: #050e0a; border: 1px solid var(--glass-border);
-      border-radius: 24px; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.95);
-      transform: translateY(40px) scale(0.95); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    /* --- FLOATING HUD OVERLAY --- */
+    .hud-overlay {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(6, 16, 12, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 215, 0, 0.5);
+      padding: 10px 24px;
+      border-radius: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      pointer-events: none;
+      z-index: 1000;
+      white-space: nowrap;
     }
-    #modal-backdrop.active .modal-card { transform: translateY(0) scale(1); }
 
-    .modal-hero { width: 100%; height: 220px; background: #0a1711; position: relative; overflow: hidden; }
-    .modal-hero-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.65; mix-blend-mode: luminosity; }
-    .modal-close {
-      position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; border-radius: 50%;
-      background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff;
-      font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: 0.2s;
+    .hud-text {
+      font-size: 0.85rem;
+      color: #ffffff;
+      letter-spacing: 1px;
     }
-    .modal-close:hover { background: #fff; color: #000; transform: rotate(90deg); }
 
-    .modal-content { padding: 32px; max-height: 52vh; overflow-y: auto; color: #c4d4ce; font-size: 0.95rem; line-height: 1.75; }
-    .modal-content h2 { font-size: 1.7rem; color: #fff; margin-bottom: 8px; font-weight: 700; }
-    .modal-content .tagline { color: var(--accent-gold); font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; display: block; }
-    .modal-content h4 { color: var(--accent-cyan); margin-top: 22px; margin-bottom: 8px; font-size: 1.05rem; }
-
-    .modal-footer { padding: 20px 32px; background: rgba(0,0,0,0.45); border-top: 1px solid var(--glass-border); display: flex; justify-content: flex-end; gap: 12px; }
-    .btn-action {
-      background: linear-gradient(135deg, var(--accent-gold), #ff8000); color: #000; border: none;
-      padding: 12px 30px; border-radius: 30px; font-weight: 700; cursor: pointer; transition: 0.3s;
-      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.35);
+    .hud-text strong {
+      color: var(--accent-gold);
     }
-    .btn-action:hover { transform: scale(1.05); box-shadow: 0 8px 30px rgba(255, 215, 0, 0.55); }
+
+    /* Customizing Leaflet UI to match dark theme */
+    .leaflet-control-zoom a {
+      background-color: rgba(6, 16, 12, 0.9) !important;
+      color: var(--accent-gold) !important;
+      border-color: rgba(255, 215, 0, 0.4) !important;
+    }
   </style>
-
-  <!-- External Dependencies (Three.js, OrbitControls, GSAP, Postprocessing Addons) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 </head>
 <body>
 
-  <!-- Preloader -->
-  <div id="loader-screen">
-    <div class="loader-title-pre">Hare Krishna Nature Farm</div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progress-fill"></div>
+  <!-- TOP TEMPLATE HEADER -->
+  <header id="template-header">
+    <div class="template-title">Hare Krishna Nature Farm</div>
+    <div class="template-subtitle">Live Satellite Sanctuary Map • Golden Property Perimeter</div>
+  </header>
+
+  <!-- MAIN RECTANGULAR MAP VIEWPORT -->
+  <main id="map-section">
+    <div class="map-container">
+      
+      <!-- Real Google Satellite Map Canvas -->
+      <div id="real-satellite-map"></div>
+
+      <!-- Floating Information Tag -->
+      <div class="hud-overlay">
+        <span class="hud-text">🌟 <strong>Golden Boundary:</strong> Exact 29-Point Property Line • Click & Drag to Explore</span>
+      </div>
+
     </div>
-    <div class="loader-status" id="loader-text">Projecting GIS Coordinates...</div>
-  </div>
+  </main>
 
-  <!-- Cloud Title Overlay -->
-  <div id="cinematic-title-overlay">
-    <div class="title-word-box" id="title-container"></div>
-  </div>
-
-  <!-- WebGL Render Canvas -->
-  <div id="viewport"></div>
-  <div id="marker-layer"></div>
-
-  <!-- HUD Interface Overlay -->
-  <div id="hud-layer">
-    <header>
-      <div class="location-card">
-        <h1 id="hud-title">Atmospheric Descent</h1>
-        <span id="hud-sub">Altitude: 12,000m • Entering Sanctuary Airspace</span>
-      </div>
-      <nav class="nav-pill-wrap interactive-element" id="nav-container"></nav>
-    </header>
-
-    <footer>
-      <button class="btn-return-aerial interactive-element" id="btn-return" onclick="engine.returnToAerialView()">
-        <span>⬆️</span> Return to Top Aerial Map
-      </button>
-      <div class="flight-status-box" id="status-instructions">
-        🎥 <strong>Top Satellite View:</strong> Click Waypoint Holograms to Enter 360° Exploration Mode
-      </div>
-    </footer>
-  </div>
-
-  <!-- Briefing Modal -->
-  <div id="modal-backdrop" onclick="engine.closeModal(event)">
-    <div class="modal-card" onclick="event.stopPropagation()">
-      <div class="modal-hero">
-        <img class="modal-hero-img" id="modal-img" src="" alt="Sanctuary View">
-        <button class="modal-close" onclick="engine.closeModal(true)">&times;</button>
-      </div>
-      <div class="modal-content" id="modal-body"></div>
-      <div class="modal-footer">
-        <button class="btn-action" onclick="engine.closeModal(true)">Enter 360° World</button>
-      </div>
-    </div>
-  </div>
-
+  <!-- Leaflet Map Engine JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    /* ==========================================================================
-       6. SIMPLEX NOISE ENGINE
-       ========================================================================== */
-    class SimplexNoise {
-      constructor() {
-        this.grad3 = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
-        this.p = []; for(let i=0; i<256; i++) { this.p[i] = Math.floor(Math.random()*256); }
-        this.perm = []; for(let i=0; i<512; i++) { this.perm[i] = this.p[i & 255]; }
+    // ==========================================================================
+    // 1. SANCTUARY LOCATIONS LIST
+    // ==========================================================================
+    const sanctuaryLocations = [
+      { 
+        name: "Krishna Balaram Temple", 
+        lat: 12.398800, 
+        lon: 76.757700, 
+        description: "Sanctuary Center & Temple Complex",
+        isCenter: true 
+      },
+      { 
+        name: "Akshaya Patra Foundation", 
+        lat: 12.396878, 
+        lon: 76.760297, 
+        description: "Community Kitchen & Service Initiative",
+        isCenter: false 
+      },
+      { 
+        name: "Kaveri River", 
+        lat: 12.402789, 
+        lon: 76.758100, 
+        description: "Sacred Waters & Riverside Sanctuary",
+        isCenter: false 
+      },
+      { 
+        name: "Goshala", 
+        lat: 12.397269, 
+        lon: 76.757431, 
+        description: "Cow Protection & Dairy Sanctuary",
+        isCenter: false 
       }
-      dot(g, x, y) { return g[0]*x + g[1]*y; }
-      noise2D(xin, yin) {
-        let n0, n1, n2; const F2 = 0.5*(Math.sqrt(3.0)-1.0); const s = (xin+yin)*F2;
-        const i = Math.floor(xin+s); const j = Math.floor(yin+s); const G2 = (3.0-Math.sqrt(3.0))/6.0;
-        const t = (i+j)*G2; const X0 = i-t; const Y0 = j-t; const x0 = xin-X0; const y0 = yin-Y0;
-        let i1, j1; if(x0>y0) {i1=1; j1=0;} else {i1=0; j1=1;}
-        const x1 = x0 - i1 + G2; const y1 = y0 - j1 + G2; const x2 = x0 - 1.0 + 2.0 * G2; const y2 = y0 - 1.0 + 2.0 * G2;
-        const ii = i & 255; const jj = j & 255; const gi0 = this.perm[ii+this.perm[jj]] % 12;
-        const gi1 = this.perm[ii+i1+this.perm[jj+j1]] % 12; const gi2 = this.perm[ii+1+this.perm[jj+1]] % 12;
-        let t0 = 0.5 - x0*x0-y0*y0; if(t0<0) n0 = 0.0; else { t0 *= t0; n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0); }
-        let t1 = 0.5 - x1*x1-y1*y1; if(t1<0) n1 = 0.0; else { t1 *= t1; n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1); }
-        let t2 = 0.5 - x2*x2-y2*y2; if(t2<0) n2 = 0.0; else { t2 *= t2; n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2); }
-        return 70.0 * (n0 + n1 + n2);
+    ];
+
+    // ==========================================================================
+    // 2. YOUR EXACT 29-POINT PROPERTY BOUNDARY (CONVERTED TO DECIMAL DEGREES)
+    // Traced sequentially point-by-point exactly as provided!
+    // ==========================================================================
+    const farmBoundaryCoordinates = [
+      [12.402578, 76.752256], // 1.  12°24'09.28"N 76°45'08.12"E
+      [12.401856, 76.751600], // 2.  12°24'06.68"N 76°45'05.76"E
+      [12.401294, 76.751453], // 3.  12°24'04.66"N 76°45'05.23"E
+      [12.401236, 76.752019], // 4.  12°24'04.45"N 76°45'07.27"E
+      [12.400550, 76.752319], // 5.  12°24'01.98"N 76°45'08.35"E
+      [12.400881, 76.753078], // 6.  12°24'03.17"N 76°45'11.08"E
+      [12.399453, 76.753817], // 7.  12°23'58.03"N 76°45'13.74"E
+      [12.399375, 76.754164], // 8.  12°23'57.75"N 76°45'14.99"E
+      [12.396069, 76.756006], // 9.  12°23'45.85"N 76°45'21.62"E
+      [12.395019, 76.756042], // 10. 12°23'42.07"N 76°45'21.75"E
+      [12.394922, 76.757878], // 11. 12°23'41.72"N 76°45'28.36"E
+      [12.394508, 76.758061], // 12. 12°23'40.23"N 76°45'29.02"E
+      [12.394672, 76.758903], // 13. 12°23'40.82"N 76°45'32.05"E
+      [12.395489, 76.758942], // 14. 12°23'43.76"N 76°45'32.19"E
+      [12.395856, 76.760583], // 15. 12°23'45.08"N 76°45'38.10"E
+      [12.398022, 76.760436], // 16. 12°23'52.88"N 76°45'37.57"E
+      [12.398219, 76.760208], // 17. 12°23'53.59"N 76°45'36.75"E
+      [12.398961, 76.760814], // 18. 12°23'56.26"N 76°45'38.93"E
+      [12.399917, 76.760825], // 19. 12°23'59.70"N 76°45'38.97"E
+      [12.400269, 76.760572], // 20. 12°24'00.97"N 76°45'38.06"E
+      [12.400672, 76.760844], // 21. 12°24'02.42"N 76°45'39.04"E
+      [12.401369, 76.760403], // 22. 12°24'04.93"N 76°45'37.45"E
+      [12.401853, 76.760408], // 23. 12°24'06.67"N 76°45'37.47"E
+      [12.401436, 76.761311], // 24. 12°24'05.17"N 76°45'40.72"E
+      [12.401561, 76.761572], // 25. 12°24'05.62"N 76°45'41.66"E
+      [12.401175, 76.763236], // 26. 12°24'04.23"N 76°45'47.65"E
+      [12.402489, 76.763308], // 27. 12°24'08.96"N 76°45'47.91"E
+      [12.402636, 76.763100], // 28. 12°24'09.49"N 76°45'47.16"E
+      [12.402767, 76.763075]  // 29. 12°24'09.96"N 76°45'47.07"E
+    ];
+
+    // ==========================================================================
+    // 3. MAP INITIALIZATION & GOOGLE SATELLITE ENGINE
+    // ==========================================================================
+    const centerLat = sanctuaryLocations[0].lat;
+    const centerLon = sanctuaryLocations[0].lon;
+    const zoomLevel = 15;
+
+    const map = L.map('real-satellite-map', {
+      center: [centerLat, centerLon],
+      zoom: zoomLevel,
+      zoomControl: true,
+      attributionControl: false
+    });
+
+    // Load Real Google Maps Satellite Imagery Direct Tile Servers
+    L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    }).addTo(map);
+
+    // ==========================================================================
+    // 4. DRAW THE GOLDEN PROPERTY BOUNDARY
+    // ==========================================================================
+    
+    // A. Soft Golden Outer Glow Layer (adds depth)
+    L.polygon(farmBoundaryCoordinates, {
+      color: '#ffd700',       
+      weight: 8,              
+      opacity: 0.35,          
+      fill: false             
+    }).addTo(map);
+
+    // B. Sharp Golden Property Border Line
+    const propertyBoundary = L.polygon(farmBoundaryCoordinates, {
+      color: '#ffd700',       // Vibrant Gold Stroke
+      weight: 3.5,            // Clean line thickness
+      opacity: 1.0,           // 100% solid visibility
+      fillColor: '#ffd700',   // Golden interior tint
+      fillOpacity: 0.10       // 10% tint keeps satellite trees clear
+    }).addTo(map);
+
+    propertyBoundary.bindPopup("<b>Hare Krishna Nature Farm</b><br>Official 29-Point Boundary Perimeter");
+
+    // ==========================================================================
+    // 5. PLACE ALL SANCTUARY MARKERS ON THE MAP
+    // ==========================================================================
+    sanctuaryLocations.forEach(spot => {
+      const markerColor = spot.isCenter ? "#ffd700" : "#ffffff";
+      const markerRadius = spot.isCenter ? 9 : 7;
+
+      const marker = L.circleMarker([spot.lat, spot.lon], {
+        radius: markerRadius,
+        fillColor: markerColor,
+        color: "#ffd700",     
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.95
+      }).addTo(map);
+
+      const popupContent = `
+        <div style="text-align: center; font-family: sans-serif;">
+          <strong style="color: #08120e; font-size: 14px;">${spot.name}</strong><br>
+          <span style="color: #555; font-size: 12px;">${spot.description}</span><br>
+          <code style="font-size: 10px; color: #888;">${spot.lat.toFixed(4)}°, ${spot.lon.toFixed(4)}°</code>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent);
+
+      if (spot.isCenter) {
+        marker.openPopup();
       }
-    }
+    });
 
-    /* ==========================================================================
-       7. AUDIO ENGINE
-       ========================================================================== */
-    class SpatialAudioEngine {
-      constructor() { this.ctx = null; this.enabled = false; }
-      init() {
-        if (this.enabled) return;
-        try {
-          window.AudioContext = window.AudioContext || window.webkitAudioContext;
-          this.ctx = new AudioContext();
-          this.enabled = true;
-          this.buildNoiseBuffer();
-          this.startWindLoop();
-        } catch(e) {}
-      }
-      buildNoiseBuffer() {
-        const bufferSize = 2 * this.ctx.sampleRate;
-        this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const output = this.noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
-      }
-      startWindLoop() {
-        const whiteNoise = this.ctx.createBufferSource();
-        whiteNoise.buffer = this.noiseBuffer; whiteNoise.loop = true;
-        const filter = this.ctx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 400; filter.Q.value = 3.0;
-        this.windGain = this.ctx.createGain(); this.windGain.gain.value = 0.07;
-        whiteNoise.connect(filter); filter.connect(this.windGain); this.windGain.connect(this.ctx.destination);
-        whiteNoise.start();
-      }
-      playBellChime() {
-        if (!this.enabled) return;
-        const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
-        osc.type = 'sine'; osc.frequency.setValueAtTime(528, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(132, this.ctx.currentTime + 2.5);
-        gain.gain.setValueAtTime(0.3, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2.5);
-        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 2.5);
-      }
-    }
-
-    /* ==========================================================================
-       8. MASTER DATABASE (WITH 360 TEXTURE / VIDEO CAPABILITY)
-       ========================================================================== */
-    const DATABASE = {
-      aerial_overview: {
-        id: "aerial_overview",
-        title: "Hare Krishna Nature Farm",
-        subtitle: "Altitude: 850m • Top Satellite & GPS Boundary View",
-        isAerial: true,
-        cameraPos: { x: 0, y: 390, z: 480 },
-        lookAt: { x: 0, y: 0, z: 0 },
-        locations: [
-          {
-            id: "loc_river",
-            label: "1. Kaveri River",
-            pos: { x: -200, y: 15, z: -140 },
-            cameraPos: { x: -170, y: 40, z: -90 },
-            lookAt: { x: -200, y: 10, z: -160 },
-            tagline: "Perennial Hydrological Lifeline",
-            img: "https://images.unsplash.com/photo-1518173946687-a4c89083bc90?w=800&q=80",
-            textureUrl: "https://threejs.org/examples/textures/kandao3.jpg", // 360 Equirectangular photo
-            content: "<p>The sacred Kaveri River borders our northern and western property lines. Flowing directly from the Western Ghats, this perennial waterbody nourishes over 1,200 acres of organic biodiversity.</p><h4>Zero-Runoff Protection</h4><p>Automated solar sluice gates ensure zero chemical runoff or soil erosion ever reaches the sacred waters.</p>"
-          },
-          {
-            id: "loc_temple",
-            label: "2. Krishna Balaram Temple",
-            pos: { x: 130, y: 40, z: -100 },
-            cameraPos: { x: 100, y: 60, z: -50 },
-            lookAt: { x: 130, y: 40, z: -100 },
-            tagline: "Chola-Style Vedic Sanctuary",
-            img: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80",
-            textureUrl: "https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg",
-            content: "<p>Constructed using traditional interlocking black granite blocks by master Chola artisans, the temple sanctum operates as the spiritual center of the sanctuary.</p><h4>Acoustic Architecture</h4><p>The interior domed ceilings are mathematically calculated to produce natural resonant amplification during evening Vedic kirtans.</p>"
-          },
-          {
-            id: "loc_foundation",
-            label: "3. Akshaya Patra Foundation",
-            pos: { x: 170, y: 25, z: 130 },
-            cameraPos: { x: 140, y: 50, z: 170 },
-            lookAt: { x: 170, y: 25, z: 130 },
-            tagline: "Zero-Carbon Mega Kitchen",
-            img: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&q=80",
-            textureUrl: "https://threejs.org/examples/textures/kandao3.jpg",
-            content: "<p>This vertical gravity-flow kitchen facility prepares over 25,000 hot, nutrient-dense vegetarian meals every morning for children in surrounding village schools.</p><h4>Closed-Loop Biomass Boilers</h4><p>Steam cauldrons are powered entirely by agricultural waste briquettes made from sugarcane bagasse and coconut husks.</p>"
-          },
-          {
-            id: "loc_goshala",
-            label: "4. Goshala Sanctuary",
-            pos: { x: -80, y: 22, z: 150 },
-            cameraPos: { x: -50, y: 45, z: 190 },
-            lookAt: { x: -80, y: 22, z: 150 },
-            tagline: "Indigenous Gir Cow Shelter",
-            img: "https://images.unsplash.com/photo-1546445317-29f4545e9d53?w=800&q=80",
-            textureUrl: "https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg",
-            content: "<p>Home to 150 protected indigenous A2 Gir cattle. Beyond providing pure A2 milk, the cattle are the powerhouse of our soil fertility program.</p><h4>Jeevamrutham Brewing</h4><p>Cow dung and urine are fermented daily with jaggery and pulse flour to brew bio-fertilizers.</p>"
-          },
-          {
-            id: "loc_farm",
-            label: "5. Agricultural Farm",
-            pos: { x: 50, y: 20, z: 160 },
-            cameraPos: { x: 70, y: 45, z: 200 },
-            lookAt: { x: 50, y: 20, z: 160 },
-            tagline: "Regenerative Vedic Agriculture",
-            img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80",
-            textureUrl: "https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg",
-            content: "<p>Our master farm integrates multi-layer agroforestry principles. Tall Alphonso mango trees form the upper canopy, while shade-tolerant guava and spice bushes thrive underneath.</p>"
-          }
-        ]
-      }
-    };
-
-    /* ==========================================================================
-       9. PROCEDURAL BIRD FLOCKING SYSTEM
-       ========================================================================== */
-    class FlockingBirds {
-      constructor(scene, count = 40) {
-        this.group = new THREE.Group(); scene.add(this.group); this.birds = [];
-        const geom = new THREE.BufferGeometry();
-        const vertices = new Float32Array([0, 0, 0, -2.8, 0.7, -1.8, 0, 0, -4.5, 0, 0, 0, 0, 0, -4.5, 2.8, 0.7, -1.8]);
-        geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        geom.computeVertexNormals();
-        const mat = new THREE.MeshBasicMaterial({ color: 0x18241f, side: THREE.DoubleSide });
-        for(let i=0; i<count; i++) {
-          const mesh = new THREE.Mesh(geom, mat);
-          mesh.position.set((Math.random()-0.5)*450, 70 + Math.random()*90, (Math.random()-0.5)*450);
-          mesh.scale.setScalar(0.6 + Math.random()*0.5);
-          this.group.add(mesh);
-          this.birds.push({ mesh: mesh, speed: 0.5 + Math.random()*0.4, angle: Math.random()*Math.PI*2, radius: 90 + Math.random()*180, wingSpeed: 0.16 + Math.random()*0.08, wingVal: Math.random()*10, yOffset: mesh.position.y });
-        }
-      }
-      update() {
-        if (!this.group.visible) return;
-        this.birds.forEach(b => {
-          b.angle += b.speed * 0.004;
-          b.mesh.position.x = Math.cos(b.angle) * b.radius;
-          b.mesh.position.z = Math.sin(b.angle) * b.radius;
-          b.mesh.position.y = b.yOffset + Math.sin(b.angle * 4) * 6;
-          b.mesh.rotation.y = -b.angle;
-          b.wingVal += b.wingSpeed;
-          b.mesh.scale.y = Math.sin(b.wingVal) * 1.8;
-        });
-      }
-      setVisible(visible) { this.group.visible = visible; }
-    }
-
-    /* ==========================================================================
-       10. MASTER ENGINE CLASS (`NationalGeographicEngine`)
-       ========================================================================== */
-    class NationalGeographicEngine {
-      constructor() {
-        this.viewport = document.getElementById('viewport');
-        this.markerLayer = document.getElementById('marker-layer');
-        this.navContainer = document.getElementById('nav-container');
-        
-        this.simplex = new SimplexNoise();
-        this.audio = new SpatialAudioEngine();
-        this.textureLoader = new THREE.TextureLoader();
-        
-        this.markers = [];
-        this.activeLocationId = null;
-        this.isFlying = false;
-
-        this.initThree();
-        this.buildAtmosphereAndLights();
-        this.buildProceduralTerrain();
-        this.buildKaveriRiver();
-        this.buildInstancedForest();
-        this.buildVolumetricClouds();
-        
-        // ---> 1. GENERATE THE GLOWING GOLDEN OUTER BOUNDARY FROM KML COORDINATES
-        this.buildRealGPSGoldenBoundary();
-        
-        this.buildInverted360Sphere();
-        this.birds = new FlockingBirds(this.scene, 45);
-        
-        this.setupPostProcessing();
-        this.buildUI();
-        this.initEvents();
-        
-        this.animate();
-        setTimeout(() => this.runCinematicOpening(), 600);
-      }
-
-      initThree() {
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x040d0a);
-        this.scene.fog = new THREE.FogExp2(0x0c201a, 0.0014);
-
-        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3500);
-        this.camera.position.set(0, 1600, 900);
-
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.15;
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.viewport.appendChild(this.renderer.domElement);
-
-        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.enableDamping = true;
-        this.controls.dampingFactor = 0.04;
-        this.controls.maxPolarAngle = Math.PI / 2 - 0.05;
-        this.controls.minDistance = 15;
-        this.controls.maxDistance = 900;
-        this.controls.enabled = false;
-      }
-
-      setupPostProcessing() {
-        this.composer = new THREE.EffectComposer(this.renderer);
-        this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
-        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.4, 0.85);
-        this.composer.addPass(bloomPass);
-      }
-
-      buildAtmosphereAndLights() {
-        this.sunLight = new THREE.DirectionalLight(0xffeedd, 2.8);
-        this.sunLight.position.set(-350, 450, -250);
-        this.sunLight.castShadow = true;
-        this.sunLight.shadow.mapSize.width = 2048; this.sunLight.shadow.mapSize.height = 2048;
-        this.sunLight.shadow.camera.near = 50; this.sunLight.shadow.camera.far = 1400;
-        const d = 450; this.sunLight.shadow.camera.left = -d; this.sunLight.shadow.camera.right = d;
-        this.sunLight.shadow.camera.top = d; this.sunLight.shadow.camera.bottom = -d;
-        this.sunLight.shadow.bias = -0.0005;
-        this.scene.add(this.sunLight);
-        this.scene.add(new THREE.HemisphereLight(0x4488bb, 0x112211, 0.85));
-      }
-
-      buildProceduralTerrain() {
-        const size = 1400, segments = 256;
-        const geom = new THREE.PlaneGeometry(size, size, segments, segments);
-        geom.rotateX(-Math.PI / 2);
-        const pos = geom.attributes.position, colors = [], color = new THREE.Color();
-        const deepForest = new THREE.Color(0x0e2617), grassGreen = new THREE.Color(0x285424), goldenGrass = new THREE.Color(0x768532), riverMud = new THREE.Color(0x362c1e), rockGray = new THREE.Color(0x525755);
-
-        for (let i = 0; i < pos.count; i++) {
-          const x = pos.getX(i), z = pos.getZ(i);
-          let elevation = this.simplex.noise2D(x * 0.002, z * 0.002) * 65 + this.simplex.noise2D(x * 0.008, z * 0.008) * 22;
-          const riverCurve = Math.sin(z * 0.005) * 65 - 180;
-          const distToRiver = Math.abs(x - riverCurve);
-          if (distToRiver < 85) elevation -= Math.cos((distToRiver / 85) * (Math.PI / 2)) * 48;
-          pos.setY(i, elevation);
-
-          if (elevation < -16) color.copy(riverMud);
-          else if (elevation < 12) color.copy(grassGreen).lerp(riverMud, 0.3);
-          else if (elevation < 48) color.copy(deepForest).lerp(grassGreen, Math.random() * 0.5);
-          else if (elevation < 75) color.copy(goldenGrass);
-          else color.copy(rockGray);
-          colors.push(color.r, color.g, color.b);
-        }
-        geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        geom.computeVertexNormals();
-        this.terrain = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.88, metalness: 0.05 }));
-        this.terrain.receiveShadow = true;
-        this.scene.add(this.terrain);
-      }
-
-      buildKaveriRiver() {
-        const geom = new THREE.PlaneGeometry(130, 1400, 64, 256);
-        geom.rotateX(-Math.PI / 2);
-        const pos = geom.attributes.position;
-        for (let i = 0; i < pos.count; i++) {
-          const z = pos.getZ(i), riverCurve = Math.sin(z * 0.005) * 65 - 180;
-          pos.setX(i, pos.getX(i) + riverCurve); pos.setY(i, -17);
-        }
-        geom.computeVertexNormals();
-        this.waterUniforms = { time: { value: 0 }, sunDirection: { value: this.sunLight.position.clone().normalize() }, waterColor: { value: new THREE.Color(0x06211c) }, shineColor: { value: new THREE.Color(0x00f2fe) } };
-        const mat = new THREE.ShaderMaterial({
-          uniforms: this.waterUniforms,
-          vertexShader: `varying vec2 vUv; varying vec3 vNormal; varying vec3 vWorldPosition; uniform float time; void main() { vUv = uv; vNormal = normal; vec3 pos = position; pos.y += sin(pos.x * 0.2 + time * 2.2) * 0.5 + cos(pos.z * 0.1 + time * 1.6) * 0.5; vWorldPosition = (modelMatrix * vec4(pos, 1.0)).xyz; gl_Position = projectionMatrix * viewMatrix * vec4(vWorldPosition, 1.0); }`,
-          fragmentShader: `uniform vec3 sunDirection; uniform vec3 waterColor; uniform vec3 shineColor; varying vec3 vWorldPosition; varying vec3 vNormal; void main() { vec3 viewDir = normalize(cameraPosition - vWorldPosition); vec3 halfDir = normalize(sunDirection + viewDir); float specular = pow(max(dot(vNormal, halfDir), 0.0), 110.0); vec3 finalColor = mix(waterColor, shineColor, specular * 0.85); gl_FragColor = vec4(finalColor, 0.88); }`,
-          transparent: true
-        });
-        this.riverMesh = new THREE.Mesh(geom, mat);
-        this.scene.add(this.riverMesh);
-      }
-
-      buildInstancedForest() {
-        const treeCount = 4000;
-        const geom = new THREE.ConeGeometry(4.2, 15, 5); geom.translate(0, 7.5, 0);
-        const mat = new THREE.MeshStandardMaterial({ color: 0x113320, roughness: 0.72, metalness: 0.1 });
-        this.windTime = { value: 0 };
-        mat.onBeforeCompile = (shader) => {
-          shader.uniforms.windTime = this.windTime;
-          shader.vertexShader = `uniform float windTime;` + shader.vertexShader;
-          shader.vertexShader = shader.vertexShader.replace(`#include <begin_vertex>`, `#include <begin_vertex>\n float sway = pow(position.y / 15.0, 2.0); transformed.x += sin(windTime * 2.0 + instanceMatrix[3][0] * 0.1) * sway * 1.3; transformed.z += cos(windTime * 1.5 + instanceMatrix[3][2] * 0.1) * sway * 0.9;`);
-        };
-        this.treeMesh = new THREE.InstancedMesh(geom, mat, treeCount);
-        this.treeMesh.castShadow = true; this.treeMesh.receiveShadow = true;
-        const dummy = new THREE.Object3D(); let placed = 0;
-        while (placed < treeCount) {
-          const x = (Math.random() - 0.5) * 1150, z = (Math.random() - 0.5) * 1150;
-          const riverCurve = Math.sin(z * 0.005) * 65 - 180;
-          if (Math.abs(x - riverCurve) < 95 || (Math.abs(x - 50) < 130 && Math.abs(z - 160) < 130)) continue;
-          let elevation = this.simplex.noise2D(x * 0.002, z * 0.002) * 65 + this.simplex.noise2D(x * 0.008, z * 0.008) * 22;
-          dummy.position.set(x, elevation - 1, z); dummy.scale.setScalar(0.6 + Math.random() * 0.85); dummy.rotation.y = Math.random() * Math.PI * 2;
-          dummy.updateMatrix(); this.treeMesh.setMatrixAt(placed, dummy.matrix); placed++;
-        }
-        this.scene.add(this.treeMesh);
-      }
-
-      buildVolumetricClouds() {
-        this.cloudGroup = new THREE.Group(); this.scene.add(this.cloudGroup);
-        const geom = new THREE.PlaneGeometry(160, 90), mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.19, depthWrite: false, side: THREE.DoubleSide });
-        for (let i = 0; i < 70; i++) {
-          const cloud = new THREE.Mesh(geom, mat);
-          cloud.position.set((Math.random() - 0.5) * 1400, 450 + Math.random() * 220, (Math.random() - 0.5) * 1400);
-          cloud.rotation.x = Math.PI / 2; cloud.rotation.z = Math.random() * Math.PI; cloud.scale.setScalar(1 + Math.random() * 2.2);
-          this.cloudGroup.add(cloud);
-        }
-      }
-
-      /* --- GLOWING GOLDEN OUTER BOUNDARY (ACCURATELY DERIVED FROM REAL KML GPS CO-ORDS) --- */
-      buildRealGPSGoldenBoundary() {
-        // Raw GPS Lat/Lon sampling from KML <Placemark name="Boundary">
-        const rawGPS = [
-          [76.752277, 12.402630], [76.751849, 12.402094], [76.751539, 12.401410], [76.752074, 12.401031],
-          [76.753233, 12.400547], [76.753840, 12.399455], [76.754530, 12.398737], [76.754937, 12.397950],
-          [76.755648, 12.396839], [76.756035, 12.395052], [76.756854, 12.394955], [76.757869, 12.394928],
-          [76.758852, 12.394762], [76.759738, 12.395639], [76.760571, 12.396390], [76.760471, 12.397819],
-          [76.760745, 12.398917], [76.760842, 12.399666], [76.760752, 12.400634], [76.760391, 12.401615],
-          [76.761055, 12.401554], [76.761964, 12.401399], [76.763242, 12.401186], [76.763256, 12.402186],
-          [76.763072, 12.402782], [76.752277, 12.402630] // Close loop
-        ];
-
-        const centerLon = 76.7577, centerLat = 12.3988;
-        const scaleX = 35000, scaleZ = -35000; // Transform GIS coordinates to 3D world vectors
-        const points = [];
-
-        rawGPS.forEach(coord => {
-          const x = (coord[0] - centerLon) * scaleX;
-          const z = (coord[1] - centerLat) * scaleZ;
-          // Calculate terrain elevation at (x, z) so the line hovers precisely above the ground
-          let y = this.simplex.noise2D(x * 0.002, z * 0.002) * 65 + this.simplex.noise2D(x * 0.008, z * 0.008) * 22;
-          points.push(new THREE.Vector3(x, y + 5, z)); // +5 vertical hover offset
-        });
-
-        // Glowing Golden Border Material (#ffd700)
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
-        const mat = new THREE.LineBasicMaterial({ color: 0xffd700, linewidth: 4, transparent: true, opacity: 0 });
-        this.farmBoundary = new THREE.Line(geom, mat);
-        this.scene.add(this.farmBoundary);
-      }
-
-      buildInverted360Sphere() {
-        const geom = new THREE.SphereGeometry(600, 60, 40); geom.scale(-1, 1, 1);
-        this.sphereMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-        this.sphereMesh = new THREE.Mesh(geom, this.sphereMat);
-        this.sphereMesh.visible = false;
-        this.scene.add(this.sphereMesh);
-      }
-
-      runCinematicOpening() {
-        const fill = document.getElementById('progress-fill'), text = document.getElementById('loader-text');
-        fill.style.width = '35%';
-        setTimeout(() => { fill.style.width = '75%'; text.innerText = 'Rendering Golden Perimeter Line...'; }, 700);
-        setTimeout(() => { fill.style.width = '100%'; text.innerText = 'Airspace Cleared. Initiating Descent.'; }, 1300);
-
-        setTimeout(() => {
-          document.getElementById('loader-screen').classList.add('hidden');
-          this.audio.init();
-          this.triggerTitleSequence();
-
-          gsap.to(this.camera.position, {
-            x: 0, y: 390, z: 480, duration: 7.5, ease: "power3.inOut",
-            onUpdate: () => this.camera.lookAt(0, 0, 0),
-            onComplete: () => {
-              this.controls.target.set(0, 0, 0);
-              this.controls.enabled = true;
-              this.buildLocationMarkers(DATABASE.aerial_overview.locations);
-              this.animateBoundaryReveal();
-            }
-          });
-        }, 1700);
-      }
-
-      triggerTitleSequence() {
-        const container = document.getElementById('title-container');
-        "HARE KRISHNA NATURE FARM".split(" ").forEach(word => {
-          const wordDiv = document.createElement('div'); wordDiv.className = 'title-word-box';
-          for (let char of word) { const span = document.createElement('span'); span.className = 'title-char'; span.innerText = char; wordDiv.appendChild(span); }
-          container.appendChild(wordDiv);
-        });
-        const overlay = document.getElementById('cinematic-title-overlay'); overlay.style.opacity = 1;
-        container.querySelectorAll('.title-char').forEach((char, i) => { char.style.animation = `char-emerge 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards ${0.08 * i}s`; });
-        setTimeout(() => gsap.to(overlay, { opacity: 0, duration: 1.6, onComplete: () => overlay.remove() }), 5200);
-      }
-
-      animateBoundaryReveal() {
-        // Pulse the golden perimeter border high before settling at glowing state
-        gsap.to(this.farmBoundary.material, { opacity: 1, duration: 2.2, yoyo: true, repeat: 1, onComplete: () => gsap.to(this.farmBoundary.material, { opacity: 0.85, duration: 1.2 }) });
-      }
-
-      buildLocationMarkers(locationsArray) {
-        this.clearMarkers();
-        locationsArray.forEach(loc => {
-          const el = document.createElement('div'); el.className = 'holo-marker';
-          el.innerHTML = `<div class="ring-outer"></div><div class="ring-inner"></div><div class="marker-label">${loc.label}</div>`;
-          el.addEventListener('click', () => this.flyToLocation(loc));
-          this.markerLayer.appendChild(el);
-          this.markers.push({ dom: el, pos3D: new THREE.Vector3(loc.pos.x, loc.pos.y, loc.pos.z), data: loc });
-          setTimeout(() => el.classList.add('visible'), 100);
-        });
-      }
-
-      clearMarkers() { this.markerLayer.innerHTML = ''; this.markers = []; }
-
-      updateMarkerScreenPositions() {
-        if (this.markers.length === 0) return;
-        const wHalf = window.innerWidth / 2, hHalf = window.innerHeight / 2;
-        this.markers.forEach(item => {
-          const vec = item.pos3D.clone(); vec.project(this.camera);
-          if (vec.z > 1) item.dom.style.display = 'none';
-          else {
-            item.dom.style.display = 'flex';
-            item.dom.style.transform = `translate(-50%, -50%) translate(${(vec.x * wHalf) + wHalf}px, ${-(vec.y * hHalf) + hHalf}px)`;
-          }
-        });
-      }
-
-      /* --- 360° NAVIGATION: DRONE FLIGHT TO LOCATION --- */
-      flyToLocation(loc) {
-        if (this.isFlying) return;
-        this.isFlying = true;
-        this.controls.enabled = false;
-        this.clearMarkers();
-
-        document.getElementById('hud-title').innerText = loc.label;
-        document.getElementById('hud-sub').innerText = `Altitude: Low Canopy • ${loc.tagline}`;
-        document.getElementById('btn-return').style.display = 'flex';
-
-        if (loc.id === "loc_temple") this.audio.playBellChime();
-
-        const startPos = this.camera.position.clone();
-        const endPos = new THREE.Vector3(loc.cameraPos.x, loc.cameraPos.y, loc.cameraPos.z);
-        const midPos = startPos.clone().lerp(endPos, 0.5); midPos.y += 90;
-
-        const tl = gsap.timeline({
-          onUpdate: () => this.camera.lookAt(loc.lookAt.x, loc.lookAt.y, loc.lookAt.z),
-          onComplete: () => {
-            this.controls.target.set(loc.lookAt.x, loc.lookAt.y, loc.lookAt.z);
-            this.controls.enabled = true;
-            this.isFlying = false;
-            this.activeLocationId = loc.id;
-            
-            // Enable full 360° Spherical Exploration
-            if (loc.textureUrl) {
-              this.enterGroundLevel360(loc);
-            }
-            setTimeout(() => this.openModal(loc), 400);
-          }
-        });
-
-        tl.to(this.camera.position, { x: midPos.x, y: midPos.y, z: midPos.z, duration: 2.3, ease: "power2.inOut" });
-        tl.to(this.camera.rotation, { z: 0.16, duration: 1.15, yoyo: true, repeat: 1 }, 0);
-        tl.to(this.camera.position, { x: endPos.x, y: endPos.y, z: endPos.z, duration: 2.3, ease: "power2.out" }, 2.3);
-      }
-
-      /* --- 360° ROTATABLE VIRTUAL TOUR MODE --- */
-      enterGroundLevel360(loc) {
-        this.textureLoader.load(loc.textureUrl, (texture) => {
-          this.sphereMat.map = texture;
-          this.sphereMat.needsUpdate = true;
-          this.sphereMesh.position.set(loc.lookAt.x, loc.lookAt.y, loc.lookAt.z);
-          this.sphereMesh.visible = true;
-          
-          // Hide aerial terrain so visitor can pan 360° around the environment sphere
-          this.terrain.visible = false;
-          this.treeMesh.visible = false;
-          this.riverMesh.visible = false;
-          this.birds.setVisible(false);
-          this.farmBoundary.visible = false;
-
-          // Update Status HUD for 360° Controls
-          document.getElementById('status-instructions').innerHTML = "🌐 <strong>360° Exploration Mode Active:</strong> Drag Mouse / Touch to Rotate in All Directions";
-        });
-      }
-
-      returnToAerialView() {
-        if (this.isFlying) return;
-        this.isFlying = true;
-        this.controls.enabled = false;
-        this.clearMarkers();
-        document.getElementById('btn-return').style.display = 'none';
-
-        // Restore Top Satellite view elements
-        this.sphereMesh.visible = false;
-        this.terrain.visible = true;
-        this.treeMesh.visible = true;
-        this.riverMesh.visible = true;
-        this.birds.setVisible(true);
-        this.farmBoundary.visible = true;
-
-        const data = DATABASE.aerial_overview;
-        document.getElementById('hud-title').innerText = data.title;
-        document.getElementById('hud-sub').innerText = data.subtitle;
-        document.getElementById('status-instructions').innerHTML = "🎥 <strong>Top Satellite View:</strong> Click Waypoint Holograms to Enter 360° Exploration Mode";
-
-        gsap.to(this.camera.position, {
-          x: data.cameraPos.x, y: data.cameraPos.y, z: data.cameraPos.z, duration: 3.6, ease: "power3.inOut",
-          onUpdate: () => this.camera.lookAt(data.lookAt.x, data.lookAt.y, data.lookAt.z),
-          onComplete: () => {
-            this.controls.target.set(data.lookAt.x, data.lookAt.y, data.lookAt.z);
-            this.controls.enabled = true;
-            this.isFlying = false;
-            this.activeLocationId = null;
-            this.buildLocationMarkers(data.locations);
-          }
-        });
-      }
-
-      buildUI() {
-        const nav = document.getElementById('nav-container');
-        DATABASE.aerial_overview.locations.forEach(loc => {
-          const btn = document.createElement('button'); btn.className = 'nav-item-btn'; btn.innerText = loc.label;
-          btn.onclick = () => this.flyToLocation(loc); nav.appendChild(btn);
-        });
-      }
-
-      openModal(locData) {
-        document.getElementById('modal-img').src = locData.img || "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80";
-        document.getElementById('modal-body').innerHTML = `<span class="tagline">${locData.tagline || 'Interactive Waypoint'}</span><h2>${locData.label || locData.title}</h2>${locData.content}`;
-        document.getElementById('modal-backdrop').classList.add('active');
-      }
-
-      closeModal(force = false) {
-        if (force === true || event.target.id === 'modal-backdrop') document.getElementById('modal-backdrop').classList.remove('active');
-      }
-
-      initEvents() {
-        window.addEventListener('resize', () => {
-          this.camera.aspect = window.innerWidth / window.innerHeight;
-          this.camera.updateProjectionMatrix();
-          this.renderer.setSize(window.innerWidth, window.innerHeight);
-          this.composer.setSize(window.innerWidth, window.innerHeight);
-        });
-      }
-
-      animate() {
-        requestAnimationFrame(() => this.animate());
-        const delta = 0.016;
-        if (this.waterUniforms) this.waterUniforms.time.value += delta;
-        if (this.windTime) this.windTime.value += delta;
-        if (this.cloudGroup) { this.cloudGroup.children.forEach(c => { c.position.x += 0.09; if (c.position.x > 700) c.position.x = -700; }); }
-        this.birds.update();
-        this.updateMarkerScreenPositions();
-        this.controls.update();
-        this.composer.render();
-      }
-    }
-
-    // Bootstrap Application
-    let engine;
-    window.addEventListener('DOMContentLoaded', () => { engine = new NationalGeographicEngine(); });
+    // Automatically zoom and center the screen so your entire 29-point golden border fits perfectly!
+    map.fitBounds(propertyBoundary.getBounds(), { padding: [30, 30] });
   </script>
+
 </body>
 </html>
